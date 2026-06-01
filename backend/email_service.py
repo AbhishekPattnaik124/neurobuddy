@@ -12,7 +12,7 @@ def send_otp_email(to_email: str, otp_code: str, name: str):
     
     html_content = f"""
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; text-align: center; padding: 40px 20px; border: 1px solid #eee; border-radius: 10px;">
-        <h2 style="color: #333;">StudyBuddy AI</h2>
+        <h2 style="color: #333;">NeuroBuddy AI</h2>
         <p style="color: #666; font-size: 16px;">Hi {name},</p>
         <p style="color: #666; font-size: 16px;">Your verification code is:</p>
         <div style="margin: 30px 0;">
@@ -23,9 +23,9 @@ def send_otp_email(to_email: str, otp_code: str, name: str):
     """
     
     params = {
-        "from": "StudyBuddy AI <onboarding@resend.dev>",
+        "from": "NeuroBuddy AI <onboarding@resend.dev>",
         "to": [to_email],
-        "subject": "Your StudyBuddy Verification Code",
+        "subject": "Your NeuroBuddy Verification Code",
         "html": html_content,
     }
     
@@ -46,7 +46,7 @@ def send_progress_report(to_email: str, name: str, topic: str, score: int, total
     
     html_content = f"""
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; text-align: center; padding: 40px 20px; border: 1px solid #eee; border-radius: 10px; background: #ffffff;">
-        <h2 style="color: #333; margin-bottom: 5px;">StudyBuddy AI</h2>
+        <h2 style="color: #333; margin-bottom: 5px;">NeuroBuddy AI</h2>
         <p style="color: #666; font-size: 14px; margin-top: 0; text-transform: uppercase; letter-spacing: 1px;">Progress Report</p>
         
         <div style="margin: 40px 0; padding: 30px; background: #f8fafc; border-radius: 12px; border-top: 4px solid {color};">
@@ -62,12 +62,12 @@ def send_progress_report(to_email: str, name: str, topic: str, score: int, total
         </div>
         
         <p style="color: #64748b; font-size: 14px;">Keep up the great work, {name or 'Student'}!</p>
-        <p style="color: #94a3b8; font-size: 12px; margin-top: 30px;">This is an automated message from your StudyBuddy AI.</p>
+        <p style="color: #94a3b8; font-size: 12px; margin-top: 30px;">This is an automated message from your NeuroBuddy AI.</p>
     </div>
     """
     
     params = {
-        "from": "StudyBuddy AI <onboarding@resend.dev>",
+        "from": "NeuroBuddy AI <onboarding@resend.dev>",
         "to": [to_email],
         "subject": f"Quiz Results: {topic} - {percentage}%",
         "html": html_content,

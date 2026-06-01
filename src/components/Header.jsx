@@ -39,7 +39,7 @@ export function Header({ subject, backendOnline, onSettings, onProfile, educatio
           textShadow: '0 0 20px rgba(0,229,255,0.5)',
           letterSpacing: '0.05em',
         }}>
-          StudyBuddy
+          NeuroBuddy
           <span style={{
             display: 'inline-block',
             width: '6px', height: '6px',

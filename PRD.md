@@ -1,9 +1,9 @@
 # Product Requirements Document (PRD)
-**Project Name:** AI Study Buddy
+**Project Name:** NeuroBuddy
 **Document Version:** 1.0
 
 ## 1. Product Vision & Objective
-The "AI Study Buddy" is a next-generation, multi-platform educational assistant designed to provide deeply personalized learning experiences. Unlike standard chatbots, this product integrates traditional Machine Learning (clustering) with Generative AI to mathematically profile a student's weaknesses and automatically tailor the strictness, tone, and complexity of the AI tutor.
+The "NeuroBuddy" is a next-generation, multi-platform educational assistant designed to provide deeply personalized learning experiences. Unlike standard chatbots, this product integrates traditional Machine Learning (clustering) with Generative AI to mathematically profile a student's weaknesses and automatically tailor the strictness, tone, and complexity of the AI tutor.
 
 ## 2. Target Audience
 *   **Primary Users:** High school and university students needing help with homework, concept breakdowns, and exam preparation.

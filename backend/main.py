@@ -1,5 +1,5 @@
 """
-StudyBuddy AI — FastAPI Backend
+NeuroBuddy AI — FastAPI Backend
 Proxies Gemini 2.5 Flash API with SSE streaming.
 """
 
@@ -36,7 +36,7 @@ except ImportError:
     _client = None
 
 # ── FastAPI app ───────────────────────────────────────────────────────────────
-app = FastAPI(title="StudyBuddy AI API", version="2.0.0")
+app = FastAPI(title="NeuroBuddy AI API", version="2.0.0")
 
 # Build allowed origins — always include localhost for development,
 # plus any deployed frontend URL set via the FRONTEND_URL env var.
@@ -89,7 +89,7 @@ app.add_middleware(SlowAPIMiddleware)
 # ── System prompts ────────────────────────────────────────────────────────────
 PROMPTS = {
     "chat": (
-        "You are StudyBuddy AI, an expert tutor for students. Explain any "
+        "You are NeuroBuddy AI, an expert tutor for students. Explain any "
         "concept clearly using simple language, real analogies, and examples. "
         "Format: use **bold** for key terms, bullet points for steps/lists, "
         "> blockquotes for important notes, and backticks for code. "
@@ -799,7 +799,7 @@ if __name__ == "__main__":
     import sys
     import uvicorn
     sys.stdout.reconfigure(encoding='utf-8')
-    print("\nStudyBuddy AI Backend")
+    print("\nNeuroBuddy AI Backend")
     print(f"   Model: {MODEL_ID}")
     print(f"   API Key: {'SET' if GEMINI_API_KEY else 'MISSING - edit backend/.env'}")
     print("   Running on http://localhost:8000\n")

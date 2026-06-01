@@ -121,7 +121,7 @@ export function AuthPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
               <div style={{ fontSize: '2.5rem', filter: 'drop-shadow(0 0 10px rgba(0,229,255,0.4))' }}>🧠</div>
               <h1 className="font-orbitron" style={{ fontSize: '2.2rem', fontWeight: 800, margin: 0, color: 'var(--glow-primary)', textShadow: '0 0 20px rgba(0,229,255,0.5)' }}>
-                StudyBuddy<span style={{ color: 'var(--glow-second)' }}>AI</span>
+                NeuroBuddy<span style={{ color: 'var(--glow-second)' }}>AI</span>
               </h1>
             </div>
             

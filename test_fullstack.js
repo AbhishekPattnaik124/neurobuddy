@@ -193,8 +193,8 @@ async function run() {
   await check('React app — has correct title', async () => {
     const r = await fetch(REACT_FE);
     const html = await r.text();
-    if (!html.toLowerCase().includes('studybuddy') && !html.toLowerCase().includes('neurobuddy')) {
-      throw new Error('Title missing StudyBuddy/NeuroBuddy');
+    if (!html.toLowerCase().includes('neurobuddy')) {
+      throw new Error('Title missing NeuroBuddy');
     }
     const titleMatch = html.match(/<title>(.*?)<\/title>/i);
     return `title: "${titleMatch?.[1] || 'found'}"`;

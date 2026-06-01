@@ -158,7 +158,7 @@ export function Sidebar({ active, onChange, educationLevel = 'General', onLegalC
           boxShadow: '0 4px 16px rgba(0,229,255,0.2)'
         }}>📚</div>
         <span className="font-syne" style={{ fontSize: '1.3rem', fontWeight: 700, color: '#fff', letterSpacing: '-0.5px' }}>
-          StudyBuddy
+          NeuroBuddy
         </span>
       </div>
 
@@ -223,7 +223,7 @@ export function Sidebar({ active, onChange, educationLevel = 'General', onLegalC
         <div style={{ color: 'var(--glow-primary)', fontSize: '0.65rem', marginBottom: '2px' }}>
           gemini-2.5-flash
         </div>
-        <div>StudyBuddy AI v2.0</div>
+        <div>NeuroBuddy AI v2.0</div>
       </div>
     </aside>
   );

@@ -8,7 +8,7 @@ import os
 BACKEND_URL = os.getenv("BACKEND_URL", "https://neurobuddy-backend.onrender.com")
 
 st.set_page_config(
-    page_title="StudyBuddy AI",
+    page_title="NeuroBuddy AI",
     page_icon="🧠",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -140,7 +140,7 @@ def stream_chat(messages: list, level: str):
 
 # ── Sidebar Navigation ─────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("## 🧠 StudyBuddy AI")
+    st.markdown("## 🧠 NeuroBuddy AI")
     st.markdown("*Your AI-powered learning companion*")
     st.divider()
 
@@ -205,7 +205,7 @@ elif page == "💬 Chat Tutor":
     if "messages" not in st.session_state:
         st.session_state.messages = [{
             "role": "assistant",
-            "content": "Hey! 👋 I'm your **StudyBuddy AI**. Ask me anything and I'll explain it clearly!\n\nWhat do you want to understand today?"
+            "content": "Hey! 👋 I'm your **NeuroBuddy AI**. Ask me anything and I'll explain it clearly!\n\nWhat do you want to understand today?"
         }]
 
     # Render history
@@ -604,4 +604,4 @@ elif page == "📈 Progress":
 
     st.divider()
     st.markdown("### 🚀 Open the Full Web App for Complete Progress Dashboard")
-    st.markdown("[👉 Open StudyBuddy AI Web App](https://neurobuddy-hegt.onrender.com)")
+    st.markdown("[👉 Open NeuroBuddy AI Web App](https://neurobuddy-hegt.onrender.com)")

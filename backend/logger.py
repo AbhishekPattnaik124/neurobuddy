@@ -24,4 +24,4 @@ def setup_logging():
     )
 
 setup_logging()
-logger = structlog.get_logger("studybuddy")
+logger = structlog.get_logger("NeuroBuddy")

@@ -9,7 +9,7 @@ export function PrivacyPolicy({ onBack }) {
       </div>
       <div style={{ lineHeight: '1.6', color: 'var(--text-muted)' }}>
         <h2>1. Information We Collect</h2>
-        <p>When you use StudyBuddy AI, we collect minimal personal information necessary to provide our services:</p>
+        <p>When you use NeuroBuddy AI, we collect minimal personal information necessary to provide our services:</p>
         <ul>
           <li><strong>Authentication Data:</strong> Your email address, name, and profile picture (processed securely via Firebase Authentication).</li>
           <li><strong>Usage Data:</strong> We store your quiz scores and general activity logs to help track your learning progress.</li>
@@ -49,10 +49,10 @@ export function TermsOfService({ onBack }) {
       </div>
       <div style={{ lineHeight: '1.6', color: 'var(--text-muted)' }}>
         <h2>1. Acceptance of Terms</h2>
-        <p>By accessing or using StudyBuddy AI, you agree to be bound by these Terms of Service. If you disagree with any part of the terms, you may not access the service.</p>
+        <p>By accessing or using NeuroBuddy AI, you agree to be bound by these Terms of Service. If you disagree with any part of the terms, you may not access the service.</p>
 
         <h2>2. Use of AI Services</h2>
-        <p>StudyBuddy AI utilizes artificial intelligence to generate educational content. While we strive for accuracy, AI-generated content may occasionally be incorrect or misleading. You agree to use the generated content as a learning aid and not as absolute factual truth. We are not liable for academic or professional consequences arising from the use of AI-generated answers.</p>
+        <p>NeuroBuddy AI utilizes artificial intelligence to generate educational content. While we strive for accuracy, AI-generated content may occasionally be incorrect or misleading. You agree to use the generated content as a learning aid and not as absolute factual truth. We are not liable for academic or professional consequences arising from the use of AI-generated answers.</p>
 
         <h2>3. Acceptable Use Policy</h2>
         <p>You agree NOT to:</p>

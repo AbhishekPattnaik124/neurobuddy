@@ -48,14 +48,14 @@ function MainApp() {
   const [showProfile, setShowProfile] = useState(false);
   const [backendOnline, setBackendOnline] = useState(false);
   const [educationLevel, setEducationLevel] = useState(
-    () => localStorage.getItem('studybuddy_edu_level') || 'General'
+    () => localStorage.getItem('NeuroBuddy_edu_level') || 'General'
   );
   const { toasts, addToast, removeToast } = useToast();
   const isMobile = useIsMobile();
   const { isAuthenticated, isLoading } = useAuthContext();
 
   useEffect(() => {
-    localStorage.setItem('studybuddy_edu_level', educationLevel);
+    localStorage.setItem('NeuroBuddy_edu_level', educationLevel);
   }, [educationLevel]);
 
   // Check backend on mount
@@ -92,7 +92,7 @@ function MainApp() {
         <AuroraBackground />
         <ParticleCanvas />
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'var(--text-muted)' }}>
-          Loading StudyBuddy AI...
+          Loading NeuroBuddy AI...
         </div>
       </>
     );

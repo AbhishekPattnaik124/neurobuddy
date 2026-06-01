@@ -1,4 +1,4 @@
-# AI Study Buddy 🚀🧠
+# NeuroBuddy 🚀🧠
 
 An intelligent, multi-platform educational assistant built to provide deeply personalized learning experiences. It integrates **Machine Learning (Scikit-Learn)** for student profiling and **Generative AI (Google Gemini)** for real-time tutoring.
 

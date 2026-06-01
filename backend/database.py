@@ -12,5 +12,5 @@ def get_db():
         raise ValueError("MONGODB_URI not set. Add it to .env")
     if client is None:
         client = AsyncIOMotorClient(MONGODB_URI)
-        db = client.studybuddy
+        db = client.NeuroBuddy
     return db

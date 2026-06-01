@@ -1,5 +1,5 @@
 # Technical Requirements Document (TRD)
-**Project Name:** AI Study Buddy
+**Project Name:** NeuroBuddy
 **Document Version:** 1.0
 
 ## 1. System Architecture Overview

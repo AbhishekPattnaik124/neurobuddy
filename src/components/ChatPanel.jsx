@@ -112,7 +112,7 @@ export function ChatPanel({ addToast, onSubjectDetected, educationLevel }) {
   const [messages, setMessages] = useState([{
     id: 1,
     role: 'assistant',
-    content: "Hey! 👋 I'm your **StudyBuddy AI**. Ask me anything — I'll explain it clearly with analogies, examples, and real insight.\n\nWhat do you want to understand today?",
+    content: "Hey! 👋 I'm your **NeuroBuddy AI**. Ask me anything — I'll explain it clearly with analogies, examples, and real insight.\n\nWhat do you want to understand today?",
     time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   }]);
   const [input, setInput] = useState('');
