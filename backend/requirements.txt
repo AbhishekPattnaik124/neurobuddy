@@ -8,7 +8,6 @@ joblib
 slowapi
 structlog
 cachetools
-slowapi
 chromadb
 pytest
 httpx
@@ -17,3 +16,4 @@ PyPDF2
 firebase-admin
 motor
 resend
+email-validator
