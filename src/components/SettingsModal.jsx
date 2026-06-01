@@ -28,9 +28,8 @@ export function SettingsModal({ onClose }) {
       }}
       onClick={e => e.target === e.currentTarget && onClose()}
     >
-      <div className="glass" style={{
+      <div className="glass p-panel" style={{
         width: '100%', maxWidth: '480px',
-        padding: '32px',
         animation: 'panel-enter 0.4s cubic-bezier(0.16,1,0.3,1) both',
         border: '1px solid rgba(0,229,255,0.2)',
         boxShadow: '0 0 60px rgba(0,229,255,0.08)',

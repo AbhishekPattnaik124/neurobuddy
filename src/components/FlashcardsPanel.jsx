@@ -34,12 +34,12 @@ export function FlashcardsPanel({ addToast, onSubjectDetected, educationLevel })
 
 
   return (
-    <div style={{ overflowY: 'auto', height: '100%', padding: '24px' }}>
+    <div className="p-panel" style={{ overflowY: 'auto', height: '100%' }}>
       <div style={{ maxWidth: '600px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
         {/* Topic input */}
         {!cards && !loading && (
-          <div className="glass panel-enter" style={{ padding: '28px' }}>
+          <div className="glass panel-enter p-inner">
             <div className="font-syne" style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--text-bright)', marginBottom: '8px' }}>
               Flashcard Maker
             </div>
@@ -72,7 +72,7 @@ export function FlashcardsPanel({ addToast, onSubjectDetected, educationLevel })
 
         {/* Loading */}
         {loading && (
-          <div className="glass panel-enter" style={{ padding: '40px', textAlign: 'center' }}>
+          <div className="glass panel-enter p-panel" style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>🃏</div>
             <p className="font-syne" style={{ color: 'var(--glow-primary)', fontWeight: 600 }}>Generating flashcards…</p>
           </div>

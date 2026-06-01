@@ -24,10 +24,10 @@ export function CodePairPanel({ addToast, onSubjectDetected, educationLevel }) {
   }, [code, question, addToast, onSubjectDetected, educationLevel]);
 
   return (
-    <div style={{ overflowY: 'auto', height: '100%', padding: '24px' }}>
+    <div className="p-panel" style={{ overflowY: 'auto', height: '100%' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px', height: '100%' }}>
 
-        <div className="glass panel-enter" style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div className="glass panel-enter p-inner" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
             <div className="font-syne" style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--text-bright)', marginBottom: '4px' }}>
               Code Pair Programmer
@@ -79,7 +79,7 @@ export function CodePairPanel({ addToast, onSubjectDetected, educationLevel }) {
 
         {/* Rendered Response */}
         {response && !loading && (
-          <div className="glass panel-enter" style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <div className="glass panel-enter p-inner" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <h3 className="font-syne" style={{ margin: 0, color: 'var(--text-bright)' }}>AI Code Review</h3>
             </div>

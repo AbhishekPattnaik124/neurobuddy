@@ -185,7 +185,7 @@ export function ChatPanel({ addToast, onSubjectDetected, educationLevel }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Messages */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '24px 24px 8px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div className="p-inner" style={{ flex: 1, overflowY: 'auto', paddingBottom: '8px', paddingTop: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {messages.map(msg =>
           msg.streaming && msg.content === '' ? (
             <TypingIndicator key={msg.id} />
@@ -197,8 +197,8 @@ export function ChatPanel({ addToast, onSubjectDetected, educationLevel }) {
       </div>
 
       {/* Input */}
-      <div style={{
-        padding: '16px 24px 20px',
+      <div className="p-inner" style={{
+        paddingTop: '16px', paddingBottom: '20px',
         borderTop: '1px solid rgba(0,229,255,0.06)',
         background: 'rgba(4,13,26,0.5)',
         backdropFilter: 'blur(12px)',

@@ -26,7 +26,7 @@ export function Header({ subject, backendOnline, onSettings, onProfile, educatio
         borderBottom: '1px solid rgba(0,229,255,0.15)',
         boxShadow: '0 4px 40px rgba(0,229,255,0.1)',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '0 24px',
+        padding: '0 16px',
         zIndex: 100,
       }}
     >
@@ -54,7 +54,7 @@ export function Header({ subject, backendOnline, onSettings, onProfile, educatio
       </div>
 
       {/* Center — subject badge */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <div className="hide-mobile" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         {cfg && (
           <span
             className={`subject-badge ${cfg.cls}`}
@@ -73,7 +73,7 @@ export function Header({ subject, backendOnline, onSettings, onProfile, educatio
             className="status-dot"
             style={{ background: backendOnline ? 'var(--glow-second)' : 'var(--glow-warm)' }}
           />
-          <span className="font-outfit" style={{
+          <span className="font-outfit hide-mobile" style={{
             fontSize: '0.75rem',
             color: backendOnline ? 'var(--glow-second)' : 'var(--glow-warm)',
             letterSpacing: '0.05em',
@@ -83,8 +83,8 @@ export function Header({ subject, backendOnline, onSettings, onProfile, educatio
         </div>
 
         {/* Level Selector */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginRight: '8px' }}>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', fontFamily: 'Outfit, sans-serif' }}>Level:</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginRight: '4px' }}>
+          <span className="hide-mobile" style={{ fontSize: '0.75rem', color: 'var(--text-dim)', fontFamily: 'Outfit, sans-serif' }}>Level:</span>
           <select 
             value={educationLevel}
             onChange={(e) => setEducationLevel(e.target.value)}

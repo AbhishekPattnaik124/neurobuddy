@@ -13,8 +13,8 @@ export function UserProfile({ onClose }) {
       display: 'flex', alignItems: 'center', justifyContent: 'center'
     }} onClick={onClose}>
       
-      <div className="glass panel-enter" style={{
-        width: '400px', padding: '32px', position: 'relative',
+      <div className="glass panel-enter p-panel" style={{
+        width: '100%', maxWidth: '400px', position: 'relative',
         display: 'flex', flexDirection: 'column', gap: '24px',
         border: '1px solid rgba(0,229,255,0.2)'
       }} onClick={e => e.stopPropagation()}>

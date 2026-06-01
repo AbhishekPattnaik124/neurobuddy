@@ -23,12 +23,12 @@ export function StoryModePanel({ addToast, onSubjectDetected, educationLevel }) 
   }, [topic, addToast, onSubjectDetected, educationLevel]);
 
   return (
-    <div style={{ overflowY: 'auto', height: '100%', padding: '24px' }}>
+    <div className="p-panel" style={{ overflowY: 'auto', height: '100%' }}>
       <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px', height: '100%' }}>
 
         {/* Input area */}
         {!story && !loading && (
-          <div className="glass panel-enter" style={{ padding: '28px' }}>
+          <div className="glass panel-enter p-inner">
             <div className="font-syne" style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--text-bright)', marginBottom: '8px' }}>
               StoryMode AI
             </div>
@@ -60,7 +60,7 @@ export function StoryModePanel({ addToast, onSubjectDetected, educationLevel }) 
 
         {/* Loading */}
         {loading && (
-          <div className="glass panel-enter" style={{ padding: '40px', textAlign: 'center' }}>
+          <div className="glass panel-enter p-panel" style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '2.5rem', marginBottom: '12px', animation: 'bounce 1s infinite' }}>📖</div>
             <p className="font-syne" style={{ color: 'var(--glow-primary)', fontWeight: 600 }}>Once upon a time...</p>
           </div>
@@ -68,7 +68,7 @@ export function StoryModePanel({ addToast, onSubjectDetected, educationLevel }) 
 
         {/* Rendered map */}
         {story && !loading && (
-          <div className="glass panel-enter" style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <div className="glass panel-enter p-inner" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <h3 className="font-syne" style={{ margin: 0, color: 'var(--text-bright)' }}>The Story of: {topic}</h3>
               <button onClick={() => { setStory(null); setTopic(''); }} className="btn btn-ghost" style={{ fontSize: '0.82rem' }}>

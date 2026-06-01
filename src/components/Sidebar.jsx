@@ -236,13 +236,15 @@ export function MobileTabBar({ active, onChange, educationLevel = 'General', onL
   return (
     <nav style={{
       position: 'fixed', bottom: 0, left: 0, right: 0,
-      height: '64px',
+      height: 'calc(64px + env(safe-area-inset-bottom, 0px))',
+      paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       background: 'rgba(4,13,26,0.95)',
       backdropFilter: 'blur(20px)',
       borderTop: '1px solid rgba(0,229,255,0.1)',
       display: 'flex', alignItems: 'center', justifyContent: 'space-around',
       zIndex: 100,
-      padding: '0 8px',
+      paddingLeft: '8px', paddingRight: '8px',
+      overflowX: 'auto',
     }}>
       {visibleNav.map(item => (
         <button

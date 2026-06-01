@@ -112,12 +112,12 @@ export function QuizPanel({ addToast, onSubjectDetected, educationLevel }) {
   const q = quiz?.[current];
 
   return (
-    <div style={{ overflowY: 'auto', height: '100%', padding: '24px' }}>
+    <div className="p-panel" style={{ overflowY: 'auto', height: '100%' }}>
       <div style={{ maxWidth: '680px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
         {/* Topic input */}
         {!quiz && !loading && (
-          <div className="glass panel-enter" style={{ padding: '28px' }}>
+          <div className="glass panel-enter p-inner">
             <div className="font-syne" style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--text-bright)', marginBottom: '8px' }}>
               Quiz Generator
             </div>
@@ -155,7 +155,7 @@ export function QuizPanel({ addToast, onSubjectDetected, educationLevel }) {
 
         {/* Loading */}
         {loading && (
-          <div className="glass panel-enter" style={{ padding: '32px', textAlign: 'center' }}>
+          <div className="glass panel-enter p-panel" style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '2rem', marginBottom: '12px', animation: 'spin 1.5s linear infinite', display: 'inline-block' }}>⚙️</div>
             <p className="font-syne" style={{ color: 'var(--glow-primary)', fontSize: '1rem', fontWeight: 600 }}>Crafting your quiz…</p>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '6px', fontFamily: 'Outfit, sans-serif' }}>Making it progressively harder</p>
@@ -164,7 +164,7 @@ export function QuizPanel({ addToast, onSubjectDetected, educationLevel }) {
 
         {/* Results */}
         {showResult && quiz && (
-          <div className="glass panel-enter" style={{ padding: '32px', position: 'relative', overflow: 'hidden' }}>
+          <div className="glass panel-enter p-panel" style={{ position: 'relative', overflow: 'hidden' }}>
             <ScoreRing score={score} total={quiz.length} />
 
             {/* Review */}
@@ -218,7 +218,7 @@ export function QuizPanel({ addToast, onSubjectDetected, educationLevel }) {
             </div>
 
             {/* Question card */}
-            <div className="glass" style={{ padding: '28px' }}>
+            <div className="glass p-inner">
               <p className="font-syne" style={{ fontSize: '1.05rem', fontWeight: 600, color: 'var(--text-bright)', lineHeight: 1.6, marginBottom: '22px' }}>
                 {q.q}
               </p>

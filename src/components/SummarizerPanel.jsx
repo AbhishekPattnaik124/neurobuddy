@@ -113,17 +113,11 @@ export function SummarizerPanel({ addToast, onSubjectDetected, educationLevel })
   }, [input, addToast, onSubjectDetected, educationLevel]);
 
   return (
-    <div style={{ overflowY: 'auto', height: '100%', padding: '24px' }}>
+    <div className="p-panel" style={{ overflowY: 'auto', height: '100%' }}>
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)',
-          gap: '20px',
-        }}
-          className="panel-enter"
-        >
+        <div className="responsive-grid panel-enter">
           {/* Left: input */}
-          <div className="glass" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div className="glass p-inner" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <span className="font-syne" style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-bright)' }}>
                 Paste Your Notes
@@ -171,7 +165,7 @@ export function SummarizerPanel({ addToast, onSubjectDetected, educationLevel })
           {/* Right: output */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {!loading && !summary && (
-              <div className="glass" style={{ padding: '32px', textAlign: 'center', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
+              <div className="glass p-panel" style={{ textAlign: 'center', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
                 <div style={{ fontSize: '3rem' }}>📝</div>
                 <p className="font-syne" style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: 600 }}>Summary appears here</p>
                 <p style={{ color: 'var(--text-dim)', fontSize: '0.78rem', fontFamily: 'Outfit, sans-serif' }}>
@@ -181,7 +175,7 @@ export function SummarizerPanel({ addToast, onSubjectDetected, educationLevel })
             )}
 
             {loading && (
-              <div className="glass" style={{ padding: '32px', textAlign: 'center', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
+              <div className="glass p-panel" style={{ textAlign: 'center', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
                 <div style={{ width: '48px', height: '48px', border: '3px solid rgba(0,229,255,0.1)', borderTop: '3px solid var(--glow-primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
                 <p className="font-syne" style={{ color: 'var(--glow-primary)', fontSize: '0.9rem', fontWeight: 600 }}>Analyzing your text…</p>
               </div>
@@ -206,13 +200,6 @@ export function SummarizerPanel({ addToast, onSubjectDetected, educationLevel })
           </div>
         </div>
       </div>
-
-      {/* Mobile responsive style */}
-      <style>{`
-        @media (max-width: 768px) {
-          .summarizer-grid { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
     </div>
   );
 }

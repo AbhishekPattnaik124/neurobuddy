@@ -141,7 +141,7 @@ function MainApp() {
           display: 'flex',
           flex: 1,
           paddingTop: 'var(--header-h)',
-          paddingBottom: isMobile ? '64px' : 0,
+          paddingBottom: isMobile ? 'calc(64px + env(safe-area-inset-bottom, 0px))' : 0,
           overflow: 'hidden',
         }}>
           {/* Sidebar (desktop) */}

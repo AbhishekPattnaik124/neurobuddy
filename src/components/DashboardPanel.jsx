@@ -20,9 +20,9 @@ export function DashboardPanel({ onChange, educationLevel }) {
   const firstName = user?.displayName ? user.displayName.split(' ')[0] : 'Student';
 
   return (
-    <div style={{ padding: '32px', overflowY: 'auto', height: '100%' }}>
+    <div className="p-panel" style={{ overflowY: 'auto', height: '100%' }}>
       <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-        <h1 className="font-syne" style={{ fontSize: '2.5rem', fontWeight: 700, color: 'var(--text-bright)', marginBottom: '8px' }}>
+        <h1 className="font-syne text-h1" style={{ fontWeight: 700, color: 'var(--text-bright)', marginBottom: '8px' }}>
           Welcome back, <span style={{ color: 'var(--glow-primary)' }}>{firstName}</span>! 🔥
         </h1>
         <p style={{ fontSize: '1.1rem', color: 'var(--text-muted)', marginBottom: '32px', fontFamily: 'Outfit, sans-serif' }}>
@@ -31,11 +31,7 @@ export function DashboardPanel({ onChange, educationLevel }) {
 
         <AiCoachCard />
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: '24px'
-        }}>
+        <div className="responsive-grid">
           {visibleTools.map(tool => (
             <div
               key={tool.id}
