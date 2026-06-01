@@ -31,11 +31,16 @@ export function MindMapPanel({ addToast, onSubjectDetected, educationLevel }) {
 
   useEffect(() => {
     if (mindmapCode && containerRef.current) {
-      mermaid.render('mermaid-chart', mindmapCode).then((result) => {
-        containerRef.current.innerHTML = result.svg;
+      const uniqueId = `mermaid-${Date.now()}`;
+      mermaid.render(uniqueId, mindmapCode).then((result) => {
+        if (containerRef.current) {
+          containerRef.current.innerHTML = result.svg;
+        }
       }).catch(err => {
-        console.error(err);
-        containerRef.current.innerHTML = `<div style="color:var(--glow-warm)">Failed to render mindmap. Try a simpler topic.</div>`;
+        console.error('Mermaid render error:', err);
+        if (containerRef.current) {
+          containerRef.current.innerHTML = `<div style="color:var(--glow-warm);padding:16px;text-align:center">⚠️ Failed to render mindmap. The AI may have returned an unusual format — please try a simpler topic.</div>`;
+        }
       });
     }
   }, [mindmapCode]);

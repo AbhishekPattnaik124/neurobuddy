@@ -4,6 +4,8 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 
 const AuthContext = createContext();
 
+const BACKEND = import.meta.env.VITE_BACKEND_URL || 'https://neurobuddy-backend.onrender.com';
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -15,7 +17,7 @@ export function AuthProvider({ children }) {
         // Sync user with backend
         try {
           const token = await currentUser.getIdToken();
-          await fetch('http://localhost:8000/api/auth/sync-user', {
+          await fetch(`${BACKEND}/api/auth/sync-user`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`

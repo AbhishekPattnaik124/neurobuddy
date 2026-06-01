@@ -1,6 +1,5 @@
 import React from 'react';
 import { useAuthContext } from '../contexts/AuthContext';
-import { useAuth } from '../hooks/useAuth';
 
 export function UserProfile({ onClose }) {
   const { user, logout } = useAuthContext();

@@ -38,13 +38,20 @@ except ImportError:
 # ── FastAPI app ───────────────────────────────────────────────────────────────
 app = FastAPI(title="StudyBuddy AI API", version="2.0.0")
 
+# Build allowed origins — always include localhost for development,
+# plus any deployed frontend URL set via the FRONTEND_URL env var.
+_FRONTEND_URL = os.getenv("FRONTEND_URL", "").strip()
+_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+]
+if _FRONTEND_URL:
+    _ALLOWED_ORIGINS.append(_FRONTEND_URL)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:3000",
-    ],
+    allow_origins=_ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -63,10 +70,6 @@ from rag_vector import process_pdf, add_document_to_rag, search_rag
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
-
-@app.get("/health")
-def health_check():
-    return {"status": "ok", "version": "2.0.0"}
 
 
 # ── System prompts ────────────────────────────────────────────────────────────

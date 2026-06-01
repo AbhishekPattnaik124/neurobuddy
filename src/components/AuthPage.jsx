@@ -2,12 +2,40 @@ import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { OtpInput } from './OtpInput';
 
+// Maps Firebase/backend error codes to friendly messages
+function friendlyError(err) {
+  const msg = err?.message || '';
+  if (msg.includes('auth/invalid-credential') || msg.includes('auth/wrong-password') || msg.includes('auth/user-not-found')) {
+    return 'Invalid email or password. Please try again.';
+  }
+  if (msg.includes('auth/email-already-in-use')) {
+    return 'This email is already registered. Try signing in instead.';
+  }
+  if (msg.includes('auth/weak-password')) {
+    return 'Password is too weak. Use at least 6 characters.';
+  }
+  if (msg.includes('auth/invalid-email')) {
+    return 'Please enter a valid email address.';
+  }
+  if (msg.includes('auth/too-many-requests')) {
+    return 'Too many attempts. Please wait a few minutes before trying again.';
+  }
+  if (msg.includes('auth/popup-closed-by-user')) {
+    return 'Google sign-in was cancelled. Please try again.';
+  }
+  if (msg.includes('auth/network-request-failed')) {
+    return 'Network error. Please check your connection and try again.';
+  }
+  return msg || 'Something went wrong. Please try again.';
+}
+
 export function AuthPage() {
   const [mode, setMode] = useState('login'); // login, register, forgot, otp
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   
   const { loginWithGoogle, loginWithEmail, registerWithEmail, forgotPassword, verifyOtp } = useAuth();
@@ -15,6 +43,7 @@ export function AuthPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setLoading(true);
     try {
       if (mode === 'login') {
@@ -24,20 +53,23 @@ export function AuthPage() {
         setMode('otp');
       } else if (mode === 'forgot') {
         await forgotPassword(email);
-        alert('Password reset email sent!');
+        setSuccess('Password reset email sent! Check your inbox.');
         setMode('login');
       }
     } catch (err) {
-      setError(err.message);
+      setError(friendlyError(err));
     }
     setLoading(false);
   };
 
   const handleGoogle = async () => {
+    setError('');
+    setSuccess('');
     try {
       await loginWithGoogle();
+      // onAuthStateChanged in AuthContext will handle the redirect automatically
     } catch (err) {
-      setError(err.message);
+      setError(friendlyError(err));
     }
   };
 
@@ -46,9 +78,9 @@ export function AuthPage() {
     setLoading(true);
     try {
       await verifyOtp(email, code);
-      window.location.reload(); 
+      // Firebase onAuthStateChanged will automatically update auth state and re-render the app
     } catch(err) {
-      setError(err.message);
+      setError(friendlyError(err));
     }
     setLoading(false);
   };
@@ -152,6 +184,7 @@ export function AuthPage() {
               {mode === 'otp' && 'Check your inbox for the verification code.'}
             </p>
             
+            {/* Error message */}
             {error && (
               <div style={{ 
                 color: '#ff6b35', marginBottom: '24px', animation: 'shake 0.5s', 
@@ -161,6 +194,19 @@ export function AuthPage() {
                 fontSize: '0.9rem', fontFamily: 'Outfit'
               }}>
                 <span style={{ fontSize: '1.2rem' }}>⚠️</span> {error}
+              </div>
+            )}
+
+            {/* Success message */}
+            {success && (
+              <div style={{ 
+                color: 'var(--glow-second)', marginBottom: '24px', 
+                padding: '12px 16px', background: 'rgba(0, 255, 157, 0.07)', 
+                borderRadius: '10px', border: '1px solid rgba(0, 255, 157, 0.3)',
+                display: 'flex', alignItems: 'center', gap: '10px',
+                fontSize: '0.9rem', fontFamily: 'Outfit'
+              }}>
+                <span style={{ fontSize: '1.2rem' }}>✅</span> {success}
               </div>
             )}
 
@@ -233,17 +279,17 @@ export function AuthPage() {
                 <div style={{ marginTop: '32px', display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '0.9rem', textAlign: 'center', fontFamily: 'Outfit' }}>
                   {mode === 'login' ? (
                     <>
-                      <a href="#" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.2s' }} onClick={(e) => { e.preventDefault(); setMode('forgot'); }} onMouseEnter={e=>e.target.style.color='white'} onMouseLeave={e=>e.target.style.color='var(--text-muted)'}>Forgot Password?</a>
+                      <a href="#" style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.2s' }} onClick={(e) => { e.preventDefault(); setError(''); setSuccess(''); setMode('forgot'); }} onMouseEnter={e=>e.target.style.color='white'} onMouseLeave={e=>e.target.style.color='var(--text-muted)'}>Forgot Password?</a>
                       <p style={{ color: 'var(--text-muted)', margin: 0 }}>
-                        Don't have an account? <a href="#" style={{ color: 'var(--glow-primary)', textDecoration: 'none', fontWeight: '600' }} onClick={(e) => { e.preventDefault(); setMode('register'); }}>Sign up</a>
+                        Don't have an account? <a href="#" style={{ color: 'var(--glow-primary)', textDecoration: 'none', fontWeight: '600' }} onClick={(e) => { e.preventDefault(); setError(''); setSuccess(''); setMode('register'); }}>Sign up</a>
                       </p>
                     </>
                   ) : mode === 'register' ? (
                     <p style={{ color: 'var(--text-muted)', margin: 0 }}>
-                      Already have an account? <a href="#" style={{ color: 'var(--glow-primary)', textDecoration: 'none', fontWeight: '600' }} onClick={(e) => { e.preventDefault(); setMode('login'); }}>Sign in</a>
+                      Already have an account? <a href="#" style={{ color: 'var(--glow-primary)', textDecoration: 'none', fontWeight: '600' }} onClick={(e) => { e.preventDefault(); setError(''); setSuccess(''); setMode('login'); }}>Sign in</a>
                     </p>
                   ) : (
-                    <a href="#" style={{ color: 'var(--glow-primary)', textDecoration: 'none', fontWeight: '600' }} onClick={(e) => { e.preventDefault(); setMode('login'); }}>Back to Sign in</a>
+                    <a href="#" style={{ color: 'var(--glow-primary)', textDecoration: 'none', fontWeight: '600' }} onClick={(e) => { e.preventDefault(); setError(''); setSuccess(''); setMode('login'); }}>Back to Sign in</a>
                   )}
                 </div>
               </>
