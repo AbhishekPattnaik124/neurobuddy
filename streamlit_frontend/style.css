@@ -1,0 +1,159 @@
+/* Global Reset & Colors */
+:root {
+  --bg-void:       #020810;
+  --bg-abyss:      #040d1a;
+  --bg-deep:       #071428;
+  --bg-surface:    #0a1f3d;
+  --glow-primary:  #00e5ff;
+  --glow-second:   #00ff9d;
+  --glow-third:    #7b61ff;
+  --glow-warm:     #ff6b35;
+  --text-bright:   #e8f4ff;
+  --text-muted:    #5a7a9a;
+  --text-dim:      #2a4560;
+  --radius-card:   16px;
+}
+
+/* Base App Background - Make Streamlit transparent to show our injected background */
+.stApp {
+    background-color: transparent !important;
+}
+.stApp > header {
+    background-color: transparent !important;
+}
+
+/* Hide default streamlit headers and footers */
+header[data-testid="stHeader"] {
+    display: none;
+}
+footer[data-testid="stFooter"] {
+    display: none;
+}
+.stDeployButton {
+    display: none;
+}
+
+/* Typography Overrides */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+html, body, [class*="st-"] {
+    font-family: 'Outfit', sans-serif !important;
+    color: var(--text-bright) !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Syne', sans-serif !important;
+    color: var(--text-bright) !important;
+}
+
+/* Glassmorphism Classes for use in st.markdown */
+.glass {
+  background: rgba(7, 20, 40, 0.7);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid rgba(0, 229, 255, 0.1);
+  border-radius: var(--radius-card);
+  box-shadow:
+    0 4px 24px rgba(0,0,0,0.4),
+    0 0 0 1px rgba(0,229,255,0.05) inset,
+    0 1px 0 rgba(0,229,255,0.1) inset;
+  padding: 20px;
+}
+
+.text-glow {
+  color: var(--glow-primary);
+  text-shadow: 0 0 20px rgba(0,229,255,0.5);
+}
+
+.font-orbitron {
+  font-family: 'Orbitron', sans-serif !important;
+}
+
+/* Custom Header specific to Streamlit */
+.custom-header {
+    background: rgba(10,31,61,0.8);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border-bottom: 1px solid rgba(0,229,255,0.15);
+    box-shadow: 0 4px 40px rgba(0,229,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 24px;
+    border-radius: 0 0 10px 10px;
+    margin-bottom: 20px;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-icon {
+    font-size: 1.4rem;
+}
+
+.logo-text {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--glow-primary);
+    text-shadow: 0 0 20px rgba(0,229,255,0.5);
+    letter-spacing: 0.05em;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.status-badge {
+    background: var(--glow-second);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 6px var(--glow-second);
+}
+
+/* Override Streamlit Sidebar */
+[data-testid="stSidebar"] {
+    background-color: rgba(7, 20, 40, 0.7) !important;
+    border-right: 1px solid rgba(0, 229, 255, 0.1) !important;
+    backdrop-filter: blur(16px) saturate(150%) !important;
+}
+
+[data-testid="stSidebar"] * {
+    color: var(--text-bright) !important;
+}
+
+/* Buttons */
+.stButton > button {
+    background: linear-gradient(135deg, var(--glow-primary), var(--glow-second)) !important;
+    color: var(--bg-void) !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    font-family: 'Outfit', sans-serif !important;
+    box-shadow: 0 0 20px rgba(0,229,255,0.25) !important;
+    transition: transform 0.2s, box-shadow 0.2s !important;
+}
+
+.stButton > button:hover {
+    box-shadow: 0 0 30px rgba(0,229,255,0.45) !important;
+    transform: translateY(-1px) scale(1.02) !important;
+}
+
+/* Inputs */
+.stTextInput > div > div > input {
+    background: rgba(7, 20, 40, 0.8) !important;
+    border: 1px solid rgba(0,229,255,0.12) !important;
+    color: var(--text-bright) !important;
+    border-radius: 10px !important;
+}
+
+.stTextInput > div > div > input:focus {
+    border-color: rgba(0,229,255,0.45) !important;
+    box-shadow: 0 0 20px rgba(0,229,255,0.08) !important;
+}
+
+/* Markdown styling */
+.stMarkdown p {
+    font-size: 0.95rem;
+}
