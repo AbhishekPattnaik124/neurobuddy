@@ -14,5 +14,6 @@ pytest
 httpx
 python-multipart
 PyPDF2
-structlog
-cachetools
+firebase-admin
+motor
+resend
