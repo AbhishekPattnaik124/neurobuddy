@@ -20,12 +20,17 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap');
 
 html, body, [class*="css"], [class*="st-"] {
-    font-family: 'Outfit', sans-serif !important;
+    font-family: 'Outfit', sans-serif;
+}
+/* Prevent icons from turning into text */
+.stIcon, .material-symbols-rounded, [data-testid="stIconMaterial"], [class*="Icon"] {
+    font-family: 'Material Symbols Rounded', 'Material Icons' !important;
 }
 h1, h2, h3 { font-family: 'Syne', sans-serif !important; }
 
 /* Hide Streamlit default UI chrome */
-#MainMenu, footer, header { visibility: hidden; }
+#MainMenu, footer { visibility: hidden; }
+header { background-color: transparent !important; }
 .stDeployButton { display: none; }
 
 /* Sidebar */
