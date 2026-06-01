@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { summarizeArxiv, detectSubject } from '../utils/api';
 import ReactMarkdown from 'react-markdown';
+import rehypeSanitize from 'rehype-sanitize';
 
 const SUGGESTIONS = ['electron', 'quantum computing', 'transformers machine learning', 'crispr'];
 
@@ -76,7 +77,7 @@ export function ArxivPanel({ addToast, onSubjectDetected, educationLevel }) {
             </div>
             
             <div className="markdown-body" style={{ flex: 1, padding: '16px 0', overflowY: 'auto', fontFamily: 'Outfit, sans-serif' }}>
-              <ReactMarkdown>{summary}</ReactMarkdown>
+              <ReactMarkdown rehypePlugins={[rehypeSanitize]}>{summary}</ReactMarkdown>
             </div>
           </div>
         )}

@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { streamChat, detectSubject, copyToClipboard } from '../utils/api';
+import ReactMarkdown from 'react-markdown';
+import rehypeSanitize from 'rehype-sanitize';
 
 const SEND_ICON = (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -7,22 +9,7 @@ const SEND_ICON = (
   </svg>
 );
 
-function renderMarkdown(text) {
-  if (!text) return '';
-  return text
-    .replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) =>
-      `<pre><code>${code.trim().replace(/</g,'&lt;').replace(/>/g,'&gt;')}</code></pre>`)
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
-    .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
-    .replace(/(<li>[\s\S]+?<\/li>)/g, '<ul>$1</ul>')
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/\n/g, '<br/>');
-}
+// Custom renderer removed in favor of ReactMarkdown
 
 function TypingIndicator() {
   return (
@@ -88,10 +75,13 @@ function ChatBubble({ msg, addToast }) {
           {isUser ? (
             <p style={{ color: 'var(--text-bright)', whiteSpace: 'pre-wrap' }}>{msg.content}</p>
           ) : (
-            <div
-              className="prose"
-              dangerouslySetInnerHTML={{ __html: renderMarkdown(msg.content) || '<span style="color:var(--text-muted)">…</span>' }}
-            />
+            <div className="prose">
+              {msg.content ? (
+                <ReactMarkdown rehypePlugins={[rehypeSanitize]}>{msg.content}</ReactMarkdown>
+              ) : (
+                <span style={{ color: 'var(--text-muted)' }}>…</span>
+              )}
+            </div>
           )}
         </div>
 

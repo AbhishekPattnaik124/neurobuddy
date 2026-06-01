@@ -57,6 +57,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from starlette.middleware.base import BaseHTTPMiddleware
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        response.headers["Content-Security-Policy"] = "default-src 'self'"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        return response
+
+app.add_middleware(SecurityHeadersMiddleware)
+
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi import _rate_limit_exceeded_handler
@@ -142,10 +156,12 @@ import urllib.request
 import urllib.parse
 import xml.etree.ElementTree as ET
 
+from pydantic import BaseModel, Field
+
 # ── Request schemas ───────────────────────────────────────────────────────────
 class ChatMessage(BaseModel):
     role: str   # "user" | "model"
-    content: str
+    content: str = Field(..., max_length=10000)
 
 class ChatRequest(BaseModel):
     messages: list[ChatMessage]
@@ -153,7 +169,7 @@ class ChatRequest(BaseModel):
     uid: str = None
 
 class SimpleRequest(BaseModel):
-    text: str
+    text: str = Field(..., max_length=10000)
     level: str = "General"
 
 # ── Helper ────────────────────────────────────────────────────────────────────
@@ -427,7 +443,8 @@ async def websocket_chat(websocket: WebSocket, room_id: str):
 
 
 @app.post("/api/flashcards")
-async def flashcards(req: SimpleRequest, user: dict = Depends(get_current_user)):
+@limiter.limit("10/minute")
+async def flashcards(request: Request, req: SimpleRequest, user: dict = Depends(get_current_user)):
     client = get_client()
     try:
         loop = asyncio.get_event_loop()
@@ -453,7 +470,8 @@ async def flashcards(req: SimpleRequest, user: dict = Depends(get_current_user))
 
 
 @app.post("/api/detect-subject")
-async def detect_subject(req: SimpleRequest, user: dict = Depends(get_current_user)):
+@limiter.limit("20/minute")
+async def detect_subject(request: Request, req: SimpleRequest, user: dict = Depends(get_current_user)):
     client = get_client()
     try:
         loop = asyncio.get_event_loop()
@@ -475,7 +493,8 @@ async def detect_subject(req: SimpleRequest, user: dict = Depends(get_current_us
 
 
 @app.post("/api/mindmap")
-async def generate_mindmap(req: SimpleRequest, user: dict = Depends(get_current_user)):
+@limiter.limit("10/minute")
+async def generate_mindmap(request: Request, req: SimpleRequest, user: dict = Depends(get_current_user)):
     client = get_client()
     try:
         loop = asyncio.get_event_loop()
@@ -508,7 +527,8 @@ async def generate_mindmap(req: SimpleRequest, user: dict = Depends(get_current_
 
 
 @app.post("/api/arxiv")
-async def summarize_arxiv(req: SimpleRequest, user: dict = Depends(get_current_user)):
+@limiter.limit("10/minute")
+async def summarize_arxiv(request: Request, req: SimpleRequest, user: dict = Depends(get_current_user)):
     query = req.text.strip()
     
     # 1. Fetch from ArXiv API
@@ -562,7 +582,8 @@ async def summarize_arxiv(req: SimpleRequest, user: dict = Depends(get_current_u
 
 
 @app.post("/api/storymode")
-async def generate_story(req: SimpleRequest):
+@limiter.limit("10/minute")
+async def generate_story(request: Request, req: SimpleRequest):
     client = get_client()
     try:
         loop = asyncio.get_event_loop()
@@ -587,7 +608,8 @@ async def generate_story(req: SimpleRequest):
 
 
 @app.post("/api/code-pair")
-async def generate_code_pair(req: SimpleRequest):
+@limiter.limit("10/minute")
+async def generate_code_pair(request: Request, req: SimpleRequest):
     client = get_client()
     try:
         loop = asyncio.get_event_loop()
@@ -615,71 +637,87 @@ async def generate_code_pair(req: SimpleRequest):
 
 @app.post("/api/auth/sync-user")
 async def sync_user(decoded_token: dict = Depends(get_current_user)):
-    db = get_db()
-    uid = decoded_token.get("uid")
-    email = decoded_token.get("email")
-    name = decoded_token.get("name", email.split('@')[0] if email else "User")
-    avatar_url = decoded_token.get("picture")
+    try:
+        db = get_db()
+        uid = decoded_token.get("uid")
+        email = decoded_token.get("email")
+        name = decoded_token.get("name", email.split('@')[0] if email else "User")
+        avatar_url = decoded_token.get("picture")
 
-    user = await db.users.find_one({"firebase_uid": uid})
-    if not user:
-        new_user = UserProfile(
-            firebase_uid=uid,
-            email=email,
-            name=name,
-            avatar_url=avatar_url,
-            created_at=datetime.now(timezone.utc),
-            last_seen=datetime.now(timezone.utc)
-        )
-        await db.users.insert_one(new_user.model_dump())
-        return {"status": "created", "user": new_user.model_dump()}
-    else:
-        await db.users.update_one(
-            {"firebase_uid": uid},
-            {"$set": {"last_seen": datetime.now(timezone.utc)}}
-        )
-        user['_id'] = str(user['_id'])
-        return {"status": "synced", "user": user}
+        user = await db.users.find_one({"firebase_uid": uid})
+        if not user:
+            new_user = UserProfile(
+                firebase_uid=uid,
+                email=email,
+                name=name,
+                avatar_url=avatar_url,
+                created_at=datetime.now(timezone.utc),
+                last_seen=datetime.now(timezone.utc)
+            )
+            await db.users.insert_one(new_user.model_dump())
+            return {"status": "created", "user": new_user.model_dump()}
+        else:
+            await db.users.update_one(
+                {"firebase_uid": uid},
+                {"$set": {"last_seen": datetime.now(timezone.utc)}}
+            )
+            user['_id'] = str(user['_id'])
+            return {"status": "synced", "user": user}
+    except Exception as e:
+        logger.error("sync_user_db_error", error=str(e))
+        raise HTTPException(status_code=500, detail="Database operation failed")
 
 @app.post("/api/auth/send-otp")
 async def send_otp(req: OtpRequest):
-    db = get_db()
-    otp_code = str(random.randint(100000, 999999))
-    expires_at = datetime.now(timezone.utc) + timedelta(minutes=10)
-    
-    await db.otps.update_one(
-        {"email": req.email},
-        {"$set": {"code": otp_code, "expires_at": expires_at, "name": req.name}},
-        upsert=True
-    )
-    
-    success = send_otp_email(req.email, otp_code, req.name)
-    if success is False:
-         raise HTTPException(status_code=500, detail="Failed to send OTP email")
-    return {"status": "sent"}
+    try:
+        db = get_db()
+        otp_code = str(random.randint(100000, 999999))
+        expires_at = datetime.now(timezone.utc) + timedelta(minutes=10)
+        
+        await db.otps.update_one(
+            {"email": req.email},
+            {"$set": {"code": otp_code, "expires_at": expires_at, "name": req.name}},
+            upsert=True
+        )
+        
+        success = send_otp_email(req.email, otp_code, req.name)
+        if success is False:
+             raise HTTPException(status_code=500, detail="Failed to send OTP email")
+        return {"status": "sent"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error("send_otp_db_error", error=str(e))
+        raise HTTPException(status_code=500, detail="Database operation failed")
 
 @app.post("/api/auth/verify-otp")
 async def verify_otp(req: OtpVerifyRequest):
-    db = get_db()
-    otp_doc = await db.otps.find_one({"email": req.email})
-    if not otp_doc:
-        raise HTTPException(status_code=400, detail="No OTP found for this email")
-    
-    if otp_doc.get("code") != req.code:
-        raise HTTPException(status_code=400, detail="Invalid OTP")
+    try:
+        db = get_db()
+        otp_doc = await db.otps.find_one({"email": req.email})
+        if not otp_doc:
+            raise HTTPException(status_code=400, detail="No OTP found for this email")
         
-    expires_at = otp_doc.get("expires_at")
-    if expires_at.tzinfo is None:
-        expires_at = expires_at.replace(tzinfo=timezone.utc)
+        if otp_doc.get("code") != req.code:
+            raise HTTPException(status_code=400, detail="Invalid OTP")
+            
+        expires_at = otp_doc.get("expires_at")
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+            
+        if expires_at < datetime.now(timezone.utc):
+            raise HTTPException(status_code=400, detail="OTP expired")
+            
+        await db.otps.delete_one({"email": req.email})
         
-    if expires_at < datetime.now(timezone.utc):
-        raise HTTPException(status_code=400, detail="OTP expired")
-        
-    await db.otps.delete_one({"email": req.email})
-    
-    # Mark user as verified in DB
-    await db.users.update_one({"email": req.email}, {"$set": {"email_verified": True}})
-    return {"status": "verified"}
+        # Mark user as verified in DB
+        await db.users.update_one({"email": req.email}, {"$set": {"email_verified": True}})
+        return {"status": "verified"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error("verify_otp_db_error", error=str(e))
+        raise HTTPException(status_code=500, detail="Database operation failed")
 
 @app.get("/api/auth/me")
 async def get_me(uid: str = Depends(get_current_user_uid)):

@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { generateStory, detectSubject } from '../utils/api';
 import ReactMarkdown from 'react-markdown';
+import rehypeSanitize from 'rehype-sanitize';
 
 const SUGGESTIONS = ['The Solar System', 'How Plants Grow', 'Dinosaurs', 'The Human Heart'];
 
@@ -76,7 +77,7 @@ export function StoryModePanel({ addToast, onSubjectDetected, educationLevel }) 
             </div>
             
             <div className="markdown-body" style={{ flex: 1, padding: '16px 0', overflowY: 'auto', fontFamily: 'Outfit, sans-serif', fontSize: '1.1rem', lineHeight: 1.8 }}>
-              <ReactMarkdown>{story}</ReactMarkdown>
+              <ReactMarkdown rehypePlugins={[rehypeSanitize]}>{story}</ReactMarkdown>
             </div>
           </div>
         )}

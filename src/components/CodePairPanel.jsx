@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { generateCodePair } from '../utils/api';
 import ReactMarkdown from 'react-markdown';
+import rehypeSanitize from 'rehype-sanitize';
 
 export function CodePairPanel({ addToast, onSubjectDetected, educationLevel }) {
   const [code, setCode] = useState('');
@@ -84,7 +85,7 @@ export function CodePairPanel({ addToast, onSubjectDetected, educationLevel }) {
             </div>
             
             <div className="markdown-body" style={{ flex: 1, padding: '16px 0', overflowY: 'auto', fontFamily: 'Outfit, sans-serif' }}>
-              <ReactMarkdown>{response}</ReactMarkdown>
+              <ReactMarkdown rehypePlugins={[rehypeSanitize]}>{response}</ReactMarkdown>
             </div>
           </div>
         )}

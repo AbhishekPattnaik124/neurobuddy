@@ -21,6 +21,7 @@ import { checkHealth } from './utils/api';
 import { AuthProvider, useAuthContext } from './contexts/AuthContext';
 import { AuthPage } from './components/AuthPage';
 import { UserProfile } from './components/UserProfile';
+import { PrivacyPolicy, TermsOfService } from './components/LegalPages';
 
 function useIsMobile() {
   const [mobile, setMobile] = useState(window.innerWidth < 768);
@@ -145,7 +146,7 @@ function MainApp() {
         }}>
           {/* Sidebar (desktop) */}
           {!isMobile && (
-            <Sidebar active={active} onChange={handlePanelChange} educationLevel={educationLevel} />
+            <Sidebar active={active} onChange={handlePanelChange} educationLevel={educationLevel} onLegalClick={setActive} />
           )}
 
           {/* Main panel */}
@@ -164,11 +165,13 @@ function MainApp() {
             {active === 'storymode'  && <StoryModePanel  {...panelProps} />}
             {active === 'code-pair'  && <CodePairPanel   {...panelProps} />}
             {active === 'progress'   && <ProgressPanel />}
+            {active === 'privacy'    && <PrivacyPolicy onBack={() => setActive('dashboard')} />}
+            {active === 'terms'      && <TermsOfService onBack={() => setActive('dashboard')} />}
           </main>
         </div>
 
         {/* Mobile bottom tab bar */}
-        {isMobile && <MobileTabBar active={active} onChange={handlePanelChange} educationLevel={educationLevel} />}
+        {isMobile && <MobileTabBar active={active} onChange={handlePanelChange} educationLevel={educationLevel} onLegalClick={setActive} />}
       </div>
 
       {/* Profile modal */}

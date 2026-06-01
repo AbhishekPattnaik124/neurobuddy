@@ -120,7 +120,7 @@ const NAV = [
   },
 ];
 
-export function Sidebar({ active, onChange, educationLevel = 'General' }) {
+export function Sidebar({ active, onChange, educationLevel = 'General', onLegalClick }) {
   const visibleNav = NAV.filter(item => item.levels.includes(educationLevel) || educationLevel === 'General');
 
   return (
@@ -196,7 +196,7 @@ export function Sidebar({ active, onChange, educationLevel = 'General' }) {
         ))}
       </nav>
 
-      {/* Bottom branding */}
+      {/* Bottom branding and legal */}
       <div style={{
         padding: '16px 20px',
         borderTop: '1px solid rgba(0,229,255,0.06)',
@@ -205,6 +205,21 @@ export function Sidebar({ active, onChange, educationLevel = 'General' }) {
         fontFamily: 'Outfit, sans-serif',
         lineHeight: 1.5,
       }}>
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+          <button 
+            onClick={() => onLegalClick('privacy')} 
+            style={{ background: 'none', border: 'none', color: 'inherit', padding: 0, cursor: 'pointer', textDecoration: 'underline' }}
+          >
+            Privacy
+          </button>
+          <span>&middot;</span>
+          <button 
+            onClick={() => onLegalClick('terms')} 
+            style={{ background: 'none', border: 'none', color: 'inherit', padding: 0, cursor: 'pointer', textDecoration: 'underline' }}
+          >
+            Terms
+          </button>
+        </div>
         <div style={{ color: 'var(--glow-primary)', fontSize: '0.65rem', marginBottom: '2px' }}>
           gemini-2.5-flash
         </div>
@@ -215,7 +230,7 @@ export function Sidebar({ active, onChange, educationLevel = 'General' }) {
 }
 
 /* Mobile bottom tab bar */
-export function MobileTabBar({ active, onChange, educationLevel = 'General' }) {
+export function MobileTabBar({ active, onChange, educationLevel = 'General', onLegalClick }) {
   const visibleNav = NAV.filter(item => item.levels.includes(educationLevel) || educationLevel === 'General');
   
   return (
