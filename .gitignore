@@ -7,10 +7,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Node modules and build output
 node_modules
 dist
 dist-ssr
-*.local
 
 # Editor directories and files
 .vscode/*
@@ -23,10 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 
-# Environment and secrets
-.env
-.env.*
-serviceAccountKey.json
+# Keep local (Android / Phone instance)
+mobile_app/
+patch_aar.py
 
 # Python
 __pycache__/
