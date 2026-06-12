@@ -37,6 +37,7 @@ export function AuthPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   
   const { loginWithGoogle, loginWithEmail, registerWithEmail, forgotPassword, verifyOtp } = useAuth();
 
@@ -224,7 +225,29 @@ export function AuthPage() {
                 
                 {mode !== 'forgot' && (
                   <div className="input-group">
-                    <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required className="input-ocean" />
+                    <div style={{ position: 'relative', width: '100%' }}>
+                      <input 
+                        type={showPassword ? "text" : "password"} 
+                        placeholder="Password" 
+                        value={password} 
+                        onChange={e => setPassword(e.target.value)} 
+                        required 
+                        className="input-ocean" 
+                        style={{ paddingRight: '40px' }} 
+                      />
+                      <button 
+                        type="button" 
+                        onClick={() => setShowPassword(!showPassword)}
+                        style={{ 
+                          position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', 
+                          background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.1rem',
+                          padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center'
+                        }}
+                        title={showPassword ? "Hide Password" : "Show Password"}
+                      >
+                        {showPassword ? '🙈' : '👁️'}
+                      </button>
+                    </div>
                     {mode === 'register' && password.length > 0 && (
                       <div style={{ height: '4px', width: '100%', background: 'rgba(255,255,255,0.1)', marginTop: '8px', borderRadius: '2px', overflow: 'hidden' }}>
                         <div style={{ 

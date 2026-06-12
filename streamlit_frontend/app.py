@@ -240,9 +240,10 @@ elif page == "🎯 Quiz":
     cols = st.columns(len(suggestions))
     for i, s in enumerate(suggestions):
         if cols[i].button(s, key=f"sug_{i}"):
-            st.session_state["quiz_topic"] = s
+            st.session_state["quiz_topic_input"] = s
+            st.rerun()
 
-    topic = st.text_input("Topic", value=st.session_state.get("quiz_topic", ""), placeholder="e.g. Photosynthesis")
+    topic = st.text_input("Topic", placeholder="e.g. Photosynthesis", key="quiz_topic_input")
 
     if st.button("⚡ Generate Quiz", type="primary", disabled=not topic.strip()):
         with st.spinner("Crafting your quiz…"):
@@ -322,11 +323,11 @@ elif page == "📝 Summarizer":
     EXAMPLE = """Photosynthesis is the process by which green plants, algae, and some bacteria convert light energy into chemical energy stored as glucose. The overall equation: 6CO₂ + 6H₂O + light energy → C₆H₁₂O₆ + 6O₂. There are two main stages: the light-dependent reactions (in thylakoid membranes, producing ATP and NADPH) and the Calvin cycle (in the stroma, producing glucose). Photosynthesis is critical for life — it produces oxygen and forms the base of most food chains."""
 
     if st.button("📋 Load Example"):
-        st.session_state["sum_input"] = EXAMPLE
+        st.session_state["sum_input_box"] = EXAMPLE
+        st.rerun()
 
     text = st.text_area(
         "Paste your notes or any text here",
-        value=st.session_state.get("sum_input", ""),
         height=200,
         placeholder="Paste lecture notes, textbook paragraphs, or any educational text…",
         key="sum_input_box"
@@ -454,14 +455,24 @@ elif page == "🧠 Mind Map":
     st.title("🧠 Mind Map Generator")
     st.caption("Generates a visual Mermaid.js mindmap for any topic.")
 
-    topic = st.text_input("Topic", placeholder="e.g. Machine Learning, Photosynthesis")
+    topic = st.text_input("Topic", placeholder="e.g. Machine Learning, Photosynthesis", key="mindmap_topic_input")
 
     if st.button("🧠 Generate Mind Map", type="primary", disabled=not topic.strip()):
         with st.spinner("Building your mind map…"):
             try:
                 data = post("/api/mindmap", {"text": topic, "level": edu_level})
-                code = data.get("result", "")
-                st.session_state["mindmap_code"] = code
+                raw = data.get("result", "")
+                
+                # Robustly extract mermaid block if present
+                code = raw
+                match = re.search(r'```(?:mermaid)?(.*?)```', raw, re.DOTALL)
+                if match:
+                    code = match.group(1).strip()
+                elif "mindmap" in raw:
+                    # In case it didn't use backticks but included text before it
+                    code = raw[raw.find("mindmap"):]
+                
+                st.session_state["mindmap_code"] = code.strip()
                 st.session_state["mindmap_topic"] = topic
             except Exception as e:
                 st.error(f"❌ Error: {e}")
@@ -498,9 +509,10 @@ elif page == "🔬 ArXiv":
     cols = st.columns(len(suggestions))
     for i, s in enumerate(suggestions):
         if cols[i].button(s, key=f"arxiv_sug_{i}"):
-            st.session_state["arxiv_query"] = s
+            st.session_state["arxiv_query_input"] = s
+            st.rerun()
 
-    query = st.text_input("Search topic / keywords", value=st.session_state.get("arxiv_query", ""), placeholder="e.g. attention is all you need")
+    query = st.text_input("Search topic / keywords", placeholder="e.g. attention is all you need", key="arxiv_query_input")
 
     if st.button("🔬 Fetch & Summarize", type="primary", disabled=not query.strip()):
         with st.spinner("Searching ArXiv databases…"):
@@ -531,9 +543,10 @@ elif page == "📖 Story Mode":
     cols = st.columns(len(suggestions))
     for i, s in enumerate(suggestions):
         if cols[i].button(s, key=f"story_sug_{i}"):
-            st.session_state["story_topic"] = s
+            st.session_state["story_topic_input"] = s
+            st.rerun()
 
-    topic = st.text_input("Topic for the story", value=st.session_state.get("story_topic", ""), placeholder="What should the story be about?")
+    topic = st.text_input("Topic for the story", placeholder="What should the story be about?", key="story_topic_input")
 
     if st.button("📖 Tell Me a Story!", type="primary", disabled=not topic.strip()):
         with st.spinner("Once upon a time…"):
