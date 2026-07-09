@@ -230,7 +230,7 @@ export function Sidebar({ active, onChange, educationLevel = 'General', onLegalC
 }
 
 /* Mobile bottom tab bar */
-export function MobileTabBar({ active, onChange, educationLevel = 'General', onLegalClick }) {
+export function MobileTabBar({ active, onChange, educationLevel = 'General' }) {
   const visibleNav = NAV.filter(item => item.levels.includes(educationLevel) || educationLevel === 'General');
   
   return (

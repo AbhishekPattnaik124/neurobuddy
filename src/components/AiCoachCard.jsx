@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getRecommendations } from '../utils/api';
 
 export function AiCoachCard() {
@@ -13,7 +13,13 @@ export function AiCoachCard() {
   };
 
   useEffect(() => {
-    fetchPlan();
+    let mounted = true;
+    getRecommendations().then(data => {
+      if (!mounted) return;
+      if (data?.plan) setPlan(data.plan);
+      setLoading(false);
+    });
+    return () => { mounted = false; };
   }, []);
 
   return (
@@ -41,7 +47,9 @@ export function AiCoachCard() {
             <span className="dot-bounce" style={{ animationDelay: '0.4s' }}></span>
           </div>
         ) : (
-          <p style={{ margin: 0, animation: 'fadeIn 0.5s ease' }}>{plan}</p>
+          <p style={{ margin: 0, animation: 'fadeIn 0.5s ease', color: 'var(--text-dim)', fontFamily: 'Outfit, sans-serif', fontSize: '1rem' }}>
+            {plan || 'Take a quiz to get your personalized AI study plan! 🚀'}
+          </p>
         )}
       </div>
       <style>{`

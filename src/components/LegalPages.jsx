@@ -1,5 +1,3 @@
-import React from 'react';
-
 export function PrivacyPolicy({ onBack }) {
   return (
     <div className="glass-panel" style={{ padding: '2rem', height: '100%', overflowY: 'auto' }}>

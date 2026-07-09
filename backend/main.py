@@ -17,12 +17,14 @@ from dotenv import load_dotenv
 from datetime import datetime, timezone, timedelta
 import random
 
+# ── Load environment ─────────────────────────────────────────────────────────
+from dotenv import load_dotenv
+load_dotenv()
+
 from database import get_db
 from models import UserProfile, OtpRequest, OtpVerifyRequest, ProfileUpdate, QuizScoreIn, ActivityLog
 from auth import get_current_user_uid, get_current_user
 from email_service import send_otp_email, send_progress_report
-# ── Load environment ─────────────────────────────────────────────────────────
-load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 MODEL_ID = "gemini-2.5-flash"
 
@@ -221,6 +223,7 @@ async def chat_stream(request: Request, req: ChatRequest, user: dict = Depends(g
             logger.info("chat_started", level=req.level, messages_count=len(req.messages))
             
             context = ""
+            rag_context = ""
             if req.uid and req.messages:
                 # Save user's latest prompt
                 latest_msg = req.messages[-1].content
@@ -234,7 +237,7 @@ async def chat_stream(request: Request, req: ChatRequest, user: dict = Depends(g
             system_inst = f"{PROMPTS['chat']}\n\nThe user is a {req.level} student. Adjust your explanation complexity, tone, and depth to be perfectly suited for this education level."
             if context:
                 system_inst += f"\n\nHere is the recent conversation history with this student to help you remember context:\n{context}"
-            if 'rag_context' in locals() and rag_context:
+            if rag_context:
                 system_inst += f"\n\nHere is additional context retrieved from the user's uploaded documents that might be relevant to the query:\n{rag_context}"
                 
             config = genai_types.GenerateContentConfig(

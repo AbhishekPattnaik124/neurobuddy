@@ -1,4 +1,4 @@
-# Logs
+# ── Logs ──────────────────────────────────────────────
 logs
 *.log
 npm-debug.log*
@@ -7,12 +7,20 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Node modules and build output
+# ── Node ──────────────────────────────────────────────
 node_modules
 dist
 dist-ssr
 
-# Editor directories and files
+# ── Secrets & credentials (NEVER commit these) ───────
+.env
+.env.local
+.env.*.local
+backend/.env
+backend/serviceAccountKey.json
+mobile_app/.env
+
+# ── Editor ────────────────────────────────────────────
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -23,11 +31,18 @@ dist-ssr
 *.sln
 *.sw?
 
-# Keep local (Android / Phone instance)
+# ── Mobile app (local dev only) ───────────────────────
 mobile_app/
 patch_aar.py
 
-# Python
+# ── Python ────────────────────────────────────────────
 __pycache__/
 *.pyc
 .pytest_cache/
+backend/__pycache__/
+
+# ── Capture scripts (dev only) ────────────────────────
+capture_frontend.cjs
+capture_images.cjs
+capture_images.js
+images/

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useAuthContext } from '../contexts/AuthContext';
 
 export function UserProfile({ onClose }) {
@@ -65,7 +64,7 @@ export function UserProfile({ onClose }) {
           </div>
         </div>
 
-        <button onClick={async () => { await logout(); window.location.reload(); }} className="btn btn-danger" style={{ width: '100%', marginTop: '16px', padding: '12px', fontSize: '1rem' }}>
+        <button onClick={async () => { await logout(); onClose(); }} className="btn btn-danger" style={{ width: '100%', marginTop: '16px', padding: '12px', fontSize: '1rem' }}>
           Sign Out
         </button>
 
