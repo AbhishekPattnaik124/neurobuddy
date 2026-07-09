@@ -12,14 +12,6 @@ node_modules
 dist
 dist-ssr
 
-# ── Secrets & credentials (NEVER commit these) ───────
-.env
-.env.local
-.env.*.local
-backend/.env
-backend/serviceAccountKey.json
-mobile_app/.env
-
 # ── Editor ────────────────────────────────────────────
 .vscode/*
 !.vscode/extensions.json
