@@ -20,7 +20,7 @@ function friendlyError(err) {
   if (msg.includes('auth/too-many-requests')) {
     return 'Too many attempts. Please wait a few minutes before trying again.';
   }
-  if (msg.includes('auth/popup-closed-by-user')) {
+  if (msg.includes('auth/popup-closed-by-user') || msg.includes('auth/cancelled-popup-request')) {
     return 'Google sign-in was cancelled. Please try again.';
   }
   if (msg.includes('auth/network-request-failed')) {
@@ -64,13 +64,16 @@ export function AuthPage() {
   };
 
   const handleGoogle = async () => {
+    if (loading) return;
     setError('');
     setSuccess('');
+    setLoading(true);
     try {
       await loginWithGoogle();
       // onAuthStateChanged in AuthContext will handle the redirect automatically
     } catch (err) {
       setError(friendlyError(err));
+      setLoading(false);
     }
   };
 
