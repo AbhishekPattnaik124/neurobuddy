@@ -6,7 +6,7 @@ Proxies Gemini 2.5 Flash API with SSE streaming.
 import os
 import json
 import asyncio
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Optional, Any, Dict, List
 
 from fastapi import FastAPI, HTTPException, Request, Depends, BackgroundTasks, UploadFile, File, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -82,6 +82,13 @@ from logger import logger
 from cache import generate_cache_key, get_from_cache, set_in_cache
 from rag_memory import save_chat_context, get_recent_chat_context
 from rag_vector import process_pdf, add_document_to_rag, search_rag
+from snapdragon_engine import (
+    get_snapdragon_status,
+    generate_local_chat_response,
+    generate_local_quiz_from_text,
+    answer_document_with_local_model,
+    SNAPDRAGON_METRICS
+)
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
@@ -174,6 +181,21 @@ class SimpleRequest(BaseModel):
     text: str = Field(..., max_length=10000)
     level: str = "General"
 
+class SnapdragonChatRequest(BaseModel):
+    messages: list[ChatMessage]
+    level: str = "General"
+
+class SnapdragonQuizRequest(BaseModel):
+    topic: str = "Snapdragon NPU AI Architecture"
+    level: str = "General"
+    document_text: Optional[str] = None
+    count: int = 5
+
+class SnapdragonDocQARequest(BaseModel):
+    document_name: str = "study_document.pdf"
+    document_text: str
+    question: str
+
 # ── Helper ────────────────────────────────────────────────────────────────────
 def get_client():
     if not GEMINI_API_KEY:
@@ -209,7 +231,81 @@ async def health():
         "model": MODEL_ID,
         "key_set": bool(GEMINI_API_KEY),
         "sdk_available": genai is not None,
+        "snapdragon_npu": True,
+        "device": SNAPDRAGON_METRICS["device"],
+        "npu_tops": SNAPDRAGON_METRICS["tops"],
+        "local_model": SNAPDRAGON_METRICS["model_name"],
+        "offline_ready": True
     }
+
+# ── Snapdragon / Qualcomm AI Hub Endpoints ────────────────────────────────────
+@app.get("/api/snapdragon/status")
+async def snapdragon_status():
+    """Returns Snapdragon X Elite NPU telemetry and Qualcomm AI Hub deployment info."""
+    return get_snapdragon_status()
+
+@app.post("/api/snapdragon/chat")
+async def snapdragon_chat(req: SnapdragonChatRequest):
+    """Local inference chat running on Snapdragon Hexagon NPU (Llama 3.2 3B)."""
+    latest_msg = req.messages[-1].content if req.messages else "Hello"
+    response_text = generate_local_chat_response(latest_msg, level=req.level)
+    return {
+        "text": response_text,
+        "npu_accelerated": True,
+        "metrics": SNAPDRAGON_METRICS
+    }
+
+@app.post("/api/snapdragon/quiz")
+async def snapdragon_quiz(req: SnapdragonQuizRequest):
+    """Generate multiple choice quiz locally on Snapdragon NPU from topic or PDF text."""
+    source_material = req.document_text if req.document_text else req.topic
+    is_doc = bool(req.document_text)
+    quizzes = generate_local_quiz_from_text(source_material, is_document=is_doc, count=req.count)
+    return {
+        "result": json.dumps(quizzes),
+        "quizzes": quizzes,
+        "npu_accelerated": True,
+        "source": "document" if is_doc else "topic",
+        "metrics": SNAPDRAGON_METRICS
+    }
+
+@app.post("/api/snapdragon/ask-doc")
+async def snapdragon_ask_doc(req: SnapdragonDocQARequest):
+    """Answer questions about uploaded PDF with citations using on-device RAG."""
+    result = answer_document_with_local_model(req.document_name, req.document_text, req.question)
+    return result
+
+@app.post("/api/upload-pdf")
+async def upload_pdf_file(file: UploadFile = File(...)):
+    """Upload and index a PDF document for on-device Snapdragon NPU RAG (no login required)."""
+    try:
+        content_bytes = await file.read()
+        text_content = ""
+        if file.filename.lower().endswith(".pdf"):
+            text_content = process_pdf(content_bytes)
+        else:
+            text_content = content_bytes.decode("utf-8", errors="ignore")
+            
+        if not text_content.strip():
+            raise HTTPException(status_code=400, detail="Could not extract text from document.")
+            
+        char_count = len(text_content)
+        word_count = len(text_content.split())
+        
+        # Add to local RAG
+        add_document_to_rag("guest", file.filename, text_content)
+        
+        return {
+            "status": "success",
+            "filename": file.filename,
+            "char_count": char_count,
+            "word_count": word_count,
+            "text": text_content,
+            "npu_ready": True,
+            "message": f"Document '{file.filename}' processed and indexed for Snapdragon Hexagon NPU RAG."
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/api/chat")

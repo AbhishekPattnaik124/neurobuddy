@@ -11,7 +11,7 @@ const SUBJECT_CONFIG = {
   General:         { cls: 'badge-general',    icon: '🎓', label: 'General' },
 };
 
-export function Header({ subject, backendOnline, onSettings, onProfile, educationLevel, setEducationLevel }) {
+export function Header({ subject, backendOnline, onSettings, onProfile, educationLevel, setEducationLevel, onSnapdragonClick }) {
   const cfg = subject ? SUBJECT_CONFIG[subject] : null;
 
   return (
@@ -38,23 +38,68 @@ export function Header({ subject, backendOnline, onSettings, onProfile, educatio
           color: 'var(--glow-primary)',
           textShadow: '0 0 20px rgba(0,229,255,0.5)',
           letterSpacing: '0.05em',
+          display: 'flex',
+          alignItems: 'center'
         }}>
-          NeuroBuddy
+          StudyBuddy
           <span style={{
             display: 'inline-block',
             width: '6px', height: '6px',
-            background: 'var(--glow-second)',
+            background: '#ff3366',
             borderRadius: '50%',
-            margin: '0 4px',
+            margin: '0 6px',
             animation: 'dot-pulse 2s ease-in-out infinite',
-            boxShadow: '0 0 8px var(--glow-second)',
+            boxShadow: '0 0 8px #ff3366',
           }} />
-          AI
+          <span style={{
+            color: '#ff3366',
+            fontSize: '0.65rem',
+            fontWeight: 800,
+            background: 'rgba(255, 0, 85, 0.15)',
+            border: '1px solid rgba(255, 0, 85, 0.4)',
+            padding: '2px 6px',
+            borderRadius: '6px',
+            letterSpacing: '0.08em'
+          }}>
+            SNAPDRAGON
+          </span>
         </span>
       </div>
 
-      {/* Center — subject badge */}
+      {/* Center — subject badge + Snapdragon badge */}
       <div className="hide-mobile" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <button
+          id="header-snapdragon-btn"
+          onClick={onSnapdragonClick}
+          style={{
+            display: 'flex', alignItems: 'center', gap: '8px',
+            background: 'linear-gradient(135deg, rgba(255, 0, 85, 0.15), rgba(0, 229, 255, 0.12))',
+            border: '1px solid rgba(255, 0, 85, 0.35)',
+            padding: '4px 12px',
+            borderRadius: '20px',
+            cursor: 'pointer',
+            color: '#ffffff',
+            fontSize: '0.75rem',
+            fontWeight: 700,
+            fontFamily: 'Outfit, sans-serif',
+            transition: 'all 0.2s',
+          }}
+          title="View Qualcomm AI Hub & Snapdragon NPU Specs"
+        >
+          <span style={{ color: '#ff3366' }}>⚡</span>
+          <span>Snapdragon® NPU Active</span>
+          <span style={{
+            fontSize: '0.65rem',
+            background: 'rgba(0, 255, 157, 0.15)',
+            color: 'var(--glow-second)',
+            padding: '1px 6px',
+            borderRadius: '10px',
+            fontWeight: 700
+          }}>
+            45 TOPS
+          </span>
+        </button>
+
         {cfg && (
           <span
             className={`subject-badge ${cfg.cls}`}

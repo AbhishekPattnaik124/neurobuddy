@@ -15,6 +15,8 @@ import { MindMapPanel } from './components/MindMapPanel';
 import { ArxivPanel } from './components/ArxivPanel';
 import { StoryModePanel } from './components/StoryModePanel';
 import { CodePairPanel } from './components/CodePairPanel';
+import { PdfStudyPanel } from './components/PdfStudyPanel';
+import { SnapdragonHubPanel } from './components/SnapdragonHubPanel';
 import { Toast } from './components/Toast';
 import { useToast } from './hooks/useToast';
 import { checkHealth } from './utils/api';
@@ -75,6 +77,13 @@ function MainApp() {
     if (s && s !== 'General') setSubject(s);
   }, []);
 
+  const [quizDoc, setQuizDoc] = useState(null);
+
+  const handleGenerateQuizFromDoc = (text, name) => {
+    setQuizDoc({ text, name });
+    setActive('quiz');
+  };
+
   const handlePanelChange = useCallback((panel) => {
     setActive(panel);
     setSubject(null);
@@ -93,7 +102,7 @@ function MainApp() {
         <AuroraBackground />
         <ParticleCanvas />
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'var(--text-muted)' }}>
-          Loading NeuroBuddy AI...
+          Loading StudyBuddy AI (Snapdragon NPU Edition)...
         </div>
       </>
     );
@@ -135,6 +144,7 @@ function MainApp() {
           onProfile={() => setShowProfile(true)}
           educationLevel={educationLevel}
           setEducationLevel={setEducationLevel}
+          onSnapdragonClick={() => setActive('snapdragon-hub')}
         />
 
         {/* Below header */}
@@ -156,18 +166,20 @@ function MainApp() {
             className="load-main"
             style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
           >
-            {active === 'dashboard'  && <DashboardPanel  {...panelProps} active={active} onChange={handlePanelChange} educationLevel={educationLevel} />}
-            {active === 'chat'       && <ChatPanel       {...panelProps} />}
-            {active === 'quiz'       && <QuizPanel       {...panelProps} />}
-            {active === 'summarizer' && <SummarizerPanel {...panelProps} />}
-            {active === 'flashcards' && <FlashcardsPanel {...panelProps} />}
-            {active === 'mindmap'    && <MindMapPanel    {...panelProps} />}
-            {active === 'arxiv'      && <ArxivPanel      {...panelProps} />}
-            {active === 'storymode'  && <StoryModePanel  {...panelProps} />}
-            {active === 'code-pair'  && <CodePairPanel   {...panelProps} />}
-            {active === 'progress'   && <ProgressPanel />}
-            {active === 'privacy'    && <PrivacyPolicy onBack={() => setActive('dashboard')} />}
-            {active === 'terms'      && <TermsOfService onBack={() => setActive('dashboard')} />}
+            {active === 'dashboard'      && <DashboardPanel      {...panelProps} active={active} onChange={handlePanelChange} educationLevel={educationLevel} onSnapdragonClick={() => setActive('snapdragon-hub')} />}
+            {active === 'pdf-study'      && <PdfStudyPanel      {...panelProps} onGenerateQuizFromDoc={handleGenerateQuizFromDoc} />}
+            {active === 'snapdragon-hub' && <SnapdragonHubPanel {...panelProps} />}
+            {active === 'chat'           && <ChatPanel           {...panelProps} />}
+            {active === 'quiz'           && <QuizPanel           {...panelProps} initialDocText={quizDoc?.text} initialDocName={quizDoc?.name} />}
+            {active === 'summarizer'     && <SummarizerPanel     {...panelProps} />}
+            {active === 'flashcards'     && <FlashcardsPanel     {...panelProps} />}
+            {active === 'mindmap'        && <MindMapPanel        {...panelProps} />}
+            {active === 'arxiv'          && <ArxivPanel          {...panelProps} />}
+            {active === 'storymode'      && <StoryModePanel      {...panelProps} />}
+            {active === 'code-pair'      && <CodePairPanel       {...panelProps} />}
+            {active === 'progress'       && <ProgressPanel />}
+            {active === 'privacy'        && <PrivacyPolicy onBack={() => setActive('dashboard')} />}
+            {active === 'terms'          && <TermsOfService onBack={() => setActive('dashboard')} />}
           </main>
         </div>
 

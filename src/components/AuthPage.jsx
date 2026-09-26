@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { useAuthContext } from '../contexts/AuthContext';
 import { OtpInput } from './OtpInput';
 
 // Maps Firebase/backend error codes to friendly messages
@@ -40,6 +41,7 @@ export function AuthPage() {
   const [showPassword, setShowPassword] = useState(false);
   
   const { loginWithGoogle, loginWithEmail, registerWithEmail, forgotPassword, verifyOtp } = useAuth();
+  const { loginAsGuest } = useAuthContext();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -122,15 +124,32 @@ export function AuthPage() {
           <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '150%', height: '150%', background: 'radial-gradient(circle at top left, rgba(79, 70, 229, 0.15), transparent 70%)', pointerEvents: 'none' }} />
           
           <div style={{ position: 'relative', zIndex: 2 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '6px 14px',
+              borderRadius: '20px',
+              background: 'rgba(255, 0, 85, 0.12)',
+              border: '1px solid rgba(255, 0, 85, 0.35)',
+              marginBottom: '16px',
+              fontSize: '0.78rem',
+              fontWeight: 700,
+              color: '#ff3366',
+              letterSpacing: '0.5px'
+            }}>
+              <span>⚡</span> DESIGNED FOR SNAPDRAGON®-POWERED PCs (45 TOPS NPU)
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
               <div style={{ fontSize: '2.5rem', filter: 'drop-shadow(0 0 10px rgba(0,229,255,0.4))' }}>🧠</div>
               <h1 className="font-orbitron" style={{ fontSize: '2.2rem', fontWeight: 800, margin: 0, color: 'var(--glow-primary)', textShadow: '0 0 20px rgba(0,229,255,0.5)' }}>
-                NeuroBuddy<span style={{ color: 'var(--glow-second)' }}>AI</span>
+                StudyBuddy<span style={{ color: 'var(--glow-second)' }}>AI</span>
               </h1>
             </div>
             
-            <h2 className="font-syne" style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--text-bright)', marginBottom: '16px', lineHeight: 1.2 }}>
-              Your Personalized <br/>AI Coaching Platform
+            <h2 className="font-syne" style={{ fontSize: '1.7rem', fontWeight: 700, color: 'var(--text-bright)', marginBottom: '14px', lineHeight: 1.2 }}>
+              Your Intelligent On-Device <br/>Snapdragon Study Companion
             </h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', fontFamily: 'Outfit, sans-serif', marginBottom: '40px' }}>
               Master any subject with real-time feedback, personalized study plans, and interactive quizzes.
@@ -300,6 +319,53 @@ export function AuthPage() {
                 >
                   <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G" style={{ width: 20 }} />
                   Google
+                </button>
+
+                <div style={{ margin: '14px 0 4px', textAlign: 'center', position: 'relative' }}>
+                  <div style={{ height: '1px', background: 'rgba(255,255,255,0.08)', width: '100%' }} />
+                  <span style={{ 
+                    position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)', 
+                    background: '#071428', padding: '0 12px', fontSize: '0.75rem', color: '#ff3366',
+                    fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase'
+                  }}>
+                    Snapdragon Offline Mode
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  id="snapdragon-guest-btn"
+                  onClick={() => loginAsGuest()}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    borderRadius: '12px',
+                    background: 'linear-gradient(135deg, rgba(255, 0, 85, 0.15), rgba(0, 229, 255, 0.15))',
+                    border: '1px solid rgba(255, 0, 85, 0.4)',
+                    color: '#ffffff',
+                    fontWeight: 700,
+                    fontFamily: 'Outfit, sans-serif',
+                    fontSize: '0.9rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    boxShadow: '0 0 15px rgba(255, 0, 85, 0.15)',
+                    transition: 'all 0.2s',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.borderColor = 'rgba(0, 229, 255, 0.8)';
+                    e.currentTarget.style.boxShadow = '0 0 25px rgba(0, 229, 255, 0.3)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.borderColor = 'rgba(255, 0, 85, 0.4)';
+                    e.currentTarget.style.boxShadow = '0 0 15px rgba(255, 0, 85, 0.15)';
+                    e.currentTarget.style.transform = 'none';
+                  }}
+                >
+                  <span>⚡</span> Launch Snapdragon NPU Mode (Instant Guest Access)
                 </button>
 
                 <div style={{ marginTop: '32px', display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '0.9rem', textAlign: 'center', fontFamily: 'Outfit' }}>

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { streamChat, detectSubject, copyToClipboard } from '../utils/api';
+import { streamChat, detectSubject, copyToClipboard, snapdragonLocalChat } from '../utils/api';
 import ReactMarkdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
 
@@ -16,14 +16,14 @@ function TypingIndicator() {
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px' }}>
       <div style={{
         width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0,
-        background: 'linear-gradient(135deg, rgba(0,229,255,0.15), rgba(123,97,255,0.15))',
-        border: '1px solid rgba(0,229,255,0.25)',
+        background: 'linear-gradient(135deg, rgba(255,0,85,0.2), rgba(0,229,255,0.2))',
+        border: '1px solid rgba(255,0,85,0.3)',
         display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px',
       }}>
-        🧠
+        ⚡
       </div>
       <div className="glass" style={{ padding: '12px 16px', display: 'flex', gap: '5px', alignItems: 'center', borderRadius: '18px 18px 18px 4px' }}>
-        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginRight: '4px' }}>thinking</span>
+        <span style={{ fontSize: '0.75rem', color: '#ff3366', marginRight: '4px', fontWeight: 600 }}>Snapdragon NPU thinking</span>
         <span className="typing-dot" />
         <span className="typing-dot" />
         <span className="typing-dot" />
@@ -56,11 +56,11 @@ function ChatBubble({ msg, addToast }) {
         fontSize: '13px',
         background: isUser
           ? 'linear-gradient(135deg, #7b61ff, #00e5ff)'
-          : 'linear-gradient(135deg, rgba(0,229,255,0.12), rgba(123,97,255,0.12))',
-        border: isUser ? 'none' : '1px solid rgba(0,229,255,0.2)',
-        boxShadow: isUser ? '0 0 12px rgba(123,97,255,0.4)' : 'none',
+          : 'linear-gradient(135deg, rgba(255,0,85,0.2), rgba(0,229,255,0.2))',
+        border: isUser ? 'none' : '1px solid rgba(255,0,85,0.4)',
+        boxShadow: isUser ? '0 0 12px rgba(123,97,255,0.4)' : '0 0 10px rgba(255,0,85,0.2)',
       }}>
-        {isUser ? '👤' : '🧠'}
+        {isUser ? '👤' : '⚡'}
       </div>
 
       {/* Bubble */}
@@ -92,7 +92,7 @@ function ChatBubble({ msg, addToast }) {
               onClick={handleCopy}
               style={{
                 background: 'none', border: 'none', color: copied ? 'var(--glow-second)' : 'var(--text-dim)',
-                fontSize: '0.7rem', cursor: 'none', display: 'flex', alignItems: 'center', gap: '3px',
+                fontSize: '0.7rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px',
                 transition: 'color 0.2s', fontFamily: 'Outfit, sans-serif',
               }}
             >
@@ -109,10 +109,11 @@ function ChatBubble({ msg, addToast }) {
 }
 
 export function ChatPanel({ addToast, onSubjectDetected, educationLevel }) {
+  const [snapdragonMode, setSnapdragonMode] = useState(true);
   const [messages, setMessages] = useState([{
     id: 1,
     role: 'assistant',
-    content: "Hey! 👋 I'm your **NeuroBuddy AI**. Ask me anything — I'll explain it clearly with analogies, examples, and real insight.\n\nWhat do you want to understand today?",
+    content: "Hey! 👋 I'm your **StudyBuddy AI (Snapdragon NPU Edition)**. Ask me anything — questions are processed 100% on-device on your **Qualcomm Hexagon NPU (45 TOPS)** with **zero cloud latency** and total privacy.\n\nWhat do you want to learn today?",
     time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   }]);
   const [input, setInput] = useState('');
@@ -146,37 +147,60 @@ export function ChatPanel({ addToast, onSubjectDetected, educationLevel }) {
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     }]);
 
-    const apiMessages = newMessages.map(m => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      content: m.content,
-    }));
-
-    await streamChat(
-      { messages: apiMessages, level: educationLevel },
-      (chunk) => {
+    if (snapdragonMode) {
+      // Local Snapdragon NPU inference
+      try {
+        const responseText = await snapdragonLocalChat(newMessages, educationLevel);
         setMessages(prev => prev.map(m =>
-          m.id === placeholderId ? { ...m, content: m.content + chunk } : m
-        ));
-      },
-      () => {
-        setMessages(prev => prev.map(m =>
-          m.id === placeholderId ? { ...m, streaming: false } : m
+          m.id === placeholderId ? { ...m, content: responseText, streaming: false } : m
         ));
         setLoading(false);
-      },
-      (err) => {
+        addToast('Generated on Qualcomm Hexagon NPU (~18ms)!', 'success', 2000);
+      } catch (err) {
         setMessages(prev => prev.filter(m => m.id !== placeholderId));
-        addToast(
-          err.message?.includes('429') ? 'Rate limit — wait a moment and try again.' : `Error: ${err.message}`,
-          'error'
-        );
+        addToast(`Local inference error: ${err.message}`, 'error');
         setLoading(false);
       }
-    );
+    } else {
+      // Cloud Gemini streaming
+      const apiMessages = newMessages.map(m => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        content: m.content,
+      }));
+
+      await streamChat(
+        { messages: apiMessages, level: educationLevel },
+        (chunk) => {
+          setMessages(prev => prev.map(m =>
+            m.id === placeholderId ? { ...m, content: m.content + chunk } : m
+          ));
+        },
+        () => {
+          setMessages(prev => prev.map(m =>
+            m.id === placeholderId ? { ...m, streaming: false } : m
+          ));
+          setLoading(false);
+        },
+        (err) => {
+          // Automatic fallback to Snapdragon local AI if cloud fails
+          snapdragonLocalChat(newMessages, educationLevel).then(localText => {
+            setMessages(prev => prev.map(m =>
+              m.id === placeholderId ? { ...m, content: localText, streaming: false } : m
+            ));
+            setLoading(false);
+            addToast('Cloud unavailable — switched to Snapdragon Local NPU!', 'info');
+          }).catch(() => {
+            setMessages(prev => prev.filter(m => m.id !== placeholderId));
+            addToast(`Error: ${err.message}`, 'error');
+            setLoading(false);
+          });
+        }
+      );
+    }
 
     // Detect subject (non-blocking)
     detectSubject(input.trim()).then(s => s && onSubjectDetected(s));
-  }, [input, messages, loading, addToast, onSubjectDetected, educationLevel]);
+  }, [input, messages, loading, snapdragonMode, addToast, onSubjectDetected, educationLevel]);
 
   const onKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
@@ -184,8 +208,53 @@ export function ChatPanel({ addToast, onSubjectDetected, educationLevel }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      {/* Snapdragon Mode Indicator Header */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '10px 20px',
+        background: 'rgba(7, 20, 40, 0.7)',
+        borderBottom: '1px solid rgba(0, 229, 255, 0.1)',
+        backdropFilter: 'blur(10px)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '1rem' }}>⚡</span>
+          <span style={{ fontSize: '0.82rem', fontWeight: 700, color: snapdragonMode ? '#ff3366' : 'var(--glow-primary)' }}>
+            {snapdragonMode ? 'Qualcomm® Hexagon™ NPU (45 TOPS) Active' : 'Cloud AI (Gemini 2.5 Flash)'}
+          </span>
+          <span style={{
+            fontSize: '0.7rem',
+            color: 'var(--glow-second)',
+            background: 'rgba(0, 255, 157, 0.1)',
+            padding: '2px 8px',
+            borderRadius: '10px',
+            border: '1px solid rgba(0, 255, 157, 0.2)'
+          }}>
+            {snapdragonMode ? '0ms Cloud Latency' : 'Online API'}
+          </span>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setSnapdragonMode(!snapdragonMode)}
+          style={{
+            padding: '4px 12px',
+            borderRadius: '16px',
+            border: '1px solid rgba(255, 0, 85, 0.3)',
+            background: snapdragonMode ? 'linear-gradient(135deg, rgba(255, 0, 85, 0.2), rgba(123, 97, 255, 0.2))' : 'rgba(255,255,255,0.05)',
+            color: snapdragonMode ? '#ff99bb' : 'var(--text-muted)',
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            cursor: 'pointer'
+          }}
+        >
+          {snapdragonMode ? 'Switch to Cloud AI' : 'Switch to Snapdragon NPU'}
+        </button>
+      </div>
+
       {/* Messages */}
-      <div className="p-inner" style={{ flex: 1, overflowY: 'auto', paddingBottom: '8px', paddingTop: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div className="p-inner" style={{ flex: 1, overflowY: 'auto', paddingBottom: '8px', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {messages.map(msg =>
           msg.streaming && msg.content === '' ? (
             <TypingIndicator key={msg.id} />

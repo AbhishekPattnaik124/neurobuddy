@@ -37,4 +37,14 @@ backend/__pycache__/
 capture_frontend.cjs
 capture_images.cjs
 capture_images.js
-images/
+take_snapdragon_screenshots.cjs
+record_demo_video.cjs
+images/*
+!images/screenshot*.png
+video_frames/
+
+# ── Environment & Secrets ─────────────────────────────
+.env
+.env.*
+!.env.example
+serviceAccountKey.json

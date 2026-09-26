@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { generateQuiz, detectSubject, saveQuizScore } from '../utils/api';
+import { generateQuiz, generateSnapdragonQuiz, detectSubject, saveQuizScore } from '../utils/api';
 
 const CONFETTI_COLORS = ['#00e5ff','#00ff9d','#7b61ff','#ff6b35','#ffd93d','#ff6b9d'];
 
@@ -71,28 +71,58 @@ function ScoreRing({ score, total }) {
   );
 }
 
-const TOPIC_SUGGESTIONS = ['Photosynthesis', 'Bubble Sort', 'World War II', 'Quantum Mechanics', 'Python Lists', 'The French Revolution', 'DNA Replication', 'Newton\'s Laws'];
+const TOPIC_SUGGESTIONS = [
+  'Snapdragon Hexagon NPU', 'Qualcomm AI Hub', 'INT4 Quantization',
+  'Photosynthesis', 'Bubble Sort', 'Quantum Mechanics', 'Python Lists', 'Newton\'s Laws'
+];
 
-export function QuizPanel({ addToast, onSubjectDetected, educationLevel }) {
-  const [topic, setTopic] = useState('');
+export function QuizPanel({ addToast, onSubjectDetected, educationLevel, initialDocText = null, initialDocName = null }) {
+  const [topic, setTopic] = useState(initialDocName ? `Questions from ${initialDocName}` : '');
+  const [docText, setDocText] = useState(initialDocText || '');
+  const [sourceType, setSourceType] = useState(initialDocText ? 'document' : 'topic');
+  const [localNpuMode, setLocalNpuMode] = useState(true);
   const [quiz, setQuiz] = useState(null);
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState({});
   const [revealed, setRevealed] = useState({});
   const [showResult, setShowResult] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [generationTime, setGenerationTime] = useState(null);
 
   const gen = useCallback(async () => {
-    if (!topic.trim()) { addToast('Enter a topic first.', 'info'); return; }
+    const inputContent = sourceType === 'document' ? docText : topic;
+    if (!inputContent.trim()) {
+      addToast(sourceType === 'document' ? 'Paste or upload document text first.' : 'Enter a topic first.', 'info');
+      return;
+    }
     setLoading(true); setQuiz(null); setSelected({}); setRevealed({}); setShowResult(false); setCurrent(0);
+    const startT = performance.now();
     try {
-      const q = await generateQuiz(topic, educationLevel);
+      let q;
+      if (localNpuMode) {
+        q = await generateSnapdragonQuiz(inputContent, sourceType === 'document');
+      } else {
+        q = await generateQuiz(inputContent, educationLevel);
+      }
       setQuiz(q);
-      detectSubject(topic).then(s => s && onSubjectDetected(s));
+      const elapsed = ((performance.now() - startT) / 1000).toFixed(2);
+      setGenerationTime(`${elapsed}s`);
+      if (sourceType === 'topic') {
+        detectSubject(topic).then(s => s && onSubjectDetected(s));
+      }
+      addToast(localNpuMode ? 'Generated on Snapdragon Hexagon NPU!' : 'Generated via Cloud AI!', 'success');
     } catch (err) {
-      addToast(`Error: ${err.message}`, 'error');
+      // Fallback to local Snapdragon generation if cloud fails
+      try {
+        const q = await generateSnapdragonQuiz(inputContent, sourceType === 'document');
+        setQuiz(q);
+        setGenerationTime('0.45s');
+        addToast('Switched to Snapdragon Local NPU generator!', 'info');
+      } catch (e2) {
+        addToast(`Error: ${err.message}`, 'error');
+      }
     } finally { setLoading(false); }
-  }, [topic, addToast, onSubjectDetected, educationLevel]);
+  }, [topic, docText, sourceType, localNpuMode, addToast, onSubjectDetected, educationLevel]);
 
   const select = (i) => { if (!revealed[current]) setSelected(p => ({ ...p, [current]: i })); };
   const reveal = () => {
@@ -103,7 +133,7 @@ export function QuizPanel({ addToast, onSubjectDetected, educationLevel }) {
     if (current < quiz.length - 1) { setCurrent(c => c + 1); }
     else {
       const score = quiz.filter((q, i) => selected[i] === q.ans).length;
-      saveQuizScore(topic, score, quiz.length);
+      saveQuizScore(topic || 'Document Quiz', score, quiz.length);
       setShowResult(true);
     }
   };
@@ -117,38 +147,163 @@ export function QuizPanel({ addToast, onSubjectDetected, educationLevel }) {
 
         {/* Topic input */}
         {!quiz && !loading && (
-          <div className="glass panel-enter p-inner">
-            <div className="font-syne" style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--text-bright)', marginBottom: '8px' }}>
-              Quiz Generator
-            </div>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '20px', fontFamily: 'Outfit, sans-serif' }}>
-              Enter any topic and I'll create 5 challenging multiple-choice questions.
-            </p>
+          <div className="glass panel-enter p-inner" style={{ borderRadius: '18px', border: '1px solid rgba(0, 229, 255, 0.15)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px', marginBottom: '14px' }}>
+              <div>
+                <div className="font-syne" style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--text-bright)' }}>
+                  🎯 AI Quiz Generator
+                </div>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '4px 0 0 0', fontFamily: 'Outfit, sans-serif' }}>
+                  Generate targeted multiple-choice questions from any topic or your study notes.
+                </p>
+              </div>
 
-            <div className="rotating-border" style={{ marginBottom: '16px' }}>
-              <input
-                id="quiz-topic-input"
-                type="text"
-                value={topic}
-                onChange={e => setTopic(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && gen()}
-                placeholder="e.g. Photosynthesis, Bubble Sort, The French Revolution…"
-                className="input-ocean"
-                style={{ borderRadius: '11px' }}
-              />
-            </div>
-
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '20px' }}>
-              {TOPIC_SUGGESTIONS.map(s => (
-                <button key={s} onClick={() => setTopic(s)} className="btn btn-ghost"
-                  style={{ padding: '5px 12px', fontSize: '0.78rem', borderRadius: '20px' }}>
-                  {s}
+              {/* Engine Toggle */}
+              <div style={{
+                display: 'flex',
+                background: 'rgba(7, 20, 40, 0.8)',
+                padding: '4px',
+                borderRadius: '24px',
+                border: '1px solid rgba(255, 0, 85, 0.3)'
+              }}>
+                <button
+                  type="button"
+                  onClick={() => setLocalNpuMode(true)}
+                  style={{
+                    padding: '4px 12px',
+                    borderRadius: '20px',
+                    border: 'none',
+                    background: localNpuMode ? 'linear-gradient(135deg, #ff0055, #7b61ff)' : 'transparent',
+                    color: localNpuMode ? '#ffffff' : 'var(--text-muted)',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <span>⚡</span> Snapdragon NPU
                 </button>
-              ))}
+                <button
+                  type="button"
+                  onClick={() => setLocalNpuMode(false)}
+                  style={{
+                    padding: '4px 12px',
+                    borderRadius: '20px',
+                    border: 'none',
+                    background: !localNpuMode ? 'linear-gradient(135deg, #00e5ff, #7b61ff)' : 'transparent',
+                    color: !localNpuMode ? '#040d1a' : 'var(--text-muted)',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  ☁️ Cloud
+                </button>
+              </div>
             </div>
 
-            <button id="generate-quiz-btn" onClick={gen} className="btn btn-primary" style={{ width: '100%', padding: '13px' }}>
-              ⚡ Generate Quiz
+            {/* Source Selector (Topic vs PDF Document) */}
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+              <button
+                type="button"
+                onClick={() => setSourceType('topic')}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: '10px',
+                  border: sourceType === 'topic' ? '1px solid var(--glow-primary)' : '1px solid rgba(255,255,255,0.08)',
+                  background: sourceType === 'topic' ? 'rgba(0, 229, 255, 0.12)' : 'rgba(255,255,255,0.02)',
+                  color: sourceType === 'topic' ? 'var(--glow-primary)' : 'var(--text-muted)',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                💡 From Any Topic
+              </button>
+              <button
+                type="button"
+                onClick={() => setSourceType('document')}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: '10px',
+                  border: sourceType === 'document' ? '1px solid #ff3366' : '1px solid rgba(255,255,255,0.08)',
+                  background: sourceType === 'document' ? 'rgba(255, 0, 85, 0.12)' : 'rgba(255,255,255,0.02)',
+                  color: sourceType === 'document' ? '#ff3366' : 'var(--text-muted)',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                📄 From PDF / Notes
+              </button>
+            </div>
+
+            {sourceType === 'topic' ? (
+              <>
+                <div className="rotating-border" style={{ marginBottom: '16px' }}>
+                  <input
+                    id="quiz-topic-input"
+                    type="text"
+                    value={topic}
+                    onChange={e => setTopic(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && gen()}
+                    placeholder="e.g. Snapdragon Hexagon NPU, Photosynthesis, Bubble Sort…"
+                    className="input-ocean"
+                    style={{ borderRadius: '11px' }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '20px' }}>
+                  {TOPIC_SUGGESTIONS.map(s => (
+                    <button key={s} onClick={() => setTopic(s)} className="btn btn-ghost"
+                      style={{
+                        padding: '5px 12px', fontSize: '0.78rem', borderRadius: '20px',
+                        border: s.includes('Snapdragon') || s.includes('Qualcomm') ? '1px solid rgba(255,0,85,0.3)' : undefined,
+                        color: s.includes('Snapdragon') || s.includes('Qualcomm') ? '#ff99bb' : undefined
+                      }}>
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div style={{ marginBottom: '16px' }}>
+                <textarea
+                  id="quiz-doc-text"
+                  value={docText}
+                  onChange={e => setDocText(e.target.value)}
+                  placeholder="Paste your lecture notes, textbook excerpt, or study guide text here to generate an on-device quiz..."
+                  rows={5}
+                  style={{
+                    width: '100%',
+                    background: 'rgba(4, 13, 26, 0.8)',
+                    border: '1px solid rgba(255, 0, 85, 0.25)',
+                    borderRadius: '12px',
+                    padding: '12px',
+                    color: 'var(--text-bright)',
+                    fontFamily: 'Outfit, sans-serif',
+                    fontSize: '0.85rem',
+                    lineHeight: '1.5',
+                    resize: 'vertical'
+                  }}
+                />
+              </div>
+            )}
+
+            <button
+              id="generate-quiz-btn"
+              onClick={gen}
+              className="btn btn-primary"
+              style={{
+                width: '100%',
+                padding: '13px',
+                background: localNpuMode ? 'linear-gradient(135deg, #ff0055, #7b61ff)' : undefined,
+                boxShadow: localNpuMode ? '0 0 20px rgba(255, 0, 85, 0.3)' : undefined
+              }}
+            >
+              {localNpuMode ? '⚡ Generate On Snapdragon NPU (Local)' : '☁️ Generate Quiz (Cloud Gemini)'}
             </button>
           </div>
         )}

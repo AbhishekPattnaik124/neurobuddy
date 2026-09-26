@@ -14,6 +14,31 @@ const NAV = [
     ),
   },
   {
+    id: 'pdf-study',
+    label: 'PDF Study & Q&A',
+    badge: 'NPU RAG',
+    levels: ['General', 'Grade 1-10', 'High School', 'BTech', 'MTech', 'PhD'],
+    icon: (
+      <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="9" y1="15" x2="15" y2="15"/>
+      </svg>
+    ),
+  },
+  {
+    id: 'snapdragon-hub',
+    label: 'Snapdragon NPU',
+    badge: '45 TOPS',
+    highlight: true,
+    levels: ['General', 'Grade 1-10', 'High School', 'BTech', 'MTech', 'PhD'],
+    icon: (
+      <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#ff3366" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+      </svg>
+    ),
+  },
+  {
     id: 'chat',
     label: 'Chat Explain',
     levels: ['General', 'Grade 1-10', 'High School', 'BTech', 'MTech', 'PhD'],
@@ -180,15 +205,30 @@ export function Sidebar({ active, onChange, educationLevel = 'General', onLegalC
             id={`nav-${item.id}`}
             className={`nav-item ${active === item.id ? 'active' : ''}`}
             onClick={() => onChange(item.id)}
-            style={{ width: '100%', background: 'none', border: 'none', textAlign: 'left' }}
+            style={{ width: '100%', background: 'none', border: 'none', textAlign: 'left', display: 'flex', alignItems: 'center' }}
           >
             {item.icon}
             <span style={{ fontFamily: 'Outfit, sans-serif' }}>{item.label}</span>
+            {item.badge && (
+              <span style={{
+                marginLeft: 'auto',
+                fontSize: '0.62rem',
+                fontWeight: 700,
+                color: item.highlight ? '#ff3366' : 'var(--glow-second)',
+                background: item.highlight ? 'rgba(255, 0, 85, 0.15)' : 'rgba(0, 255, 157, 0.12)',
+                border: item.highlight ? '1px solid rgba(255, 0, 85, 0.35)' : '1px solid rgba(0, 255, 157, 0.25)',
+                padding: '1px 6px',
+                borderRadius: '8px',
+                marginRight: active === item.id ? '6px' : '0'
+              }}>
+                {item.badge}
+              </span>
+            )}
             {active === item.id && (
               <span style={{
-                marginLeft: 'auto', width: '6px', height: '6px',
-                borderRadius: '50%', background: 'var(--glow-primary)',
-                boxShadow: '0 0 8px var(--glow-primary)',
+                marginLeft: item.badge ? '0' : 'auto', width: '6px', height: '6px',
+                borderRadius: '50%', background: item.highlight ? '#ff3366' : 'var(--glow-primary)',
+                boxShadow: item.highlight ? '0 0 8px #ff3366' : '0 0 8px var(--glow-primary)',
                 flexShrink: 0,
               }} />
             )}
@@ -196,9 +236,26 @@ export function Sidebar({ active, onChange, educationLevel = 'General', onLegalC
         ))}
       </nav>
 
+      {/* Snapdragon Hardware Badge */}
+      <div style={{
+        margin: '0 12px 12px',
+        padding: '10px 12px',
+        borderRadius: '12px',
+        background: 'linear-gradient(135deg, rgba(255, 0, 85, 0.1), rgba(0, 229, 255, 0.08))',
+        border: '1px solid rgba(255, 0, 85, 0.25)',
+        fontSize: '0.72rem',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, color: '#ff3366', marginBottom: '2px' }}>
+          <span>⚡</span> Snapdragon® X Elite
+        </div>
+        <div style={{ color: 'var(--text-muted)', fontSize: '0.66rem' }}>
+          Qualcomm Hexagon NPU &bull; 45 TOPS
+        </div>
+      </div>
+
       {/* Bottom branding and legal */}
       <div style={{
-        padding: '16px 20px',
+        padding: '12px 20px',
         borderTop: '1px solid rgba(0,229,255,0.06)',
         fontSize: '0.7rem',
         color: 'var(--text-dim)',
